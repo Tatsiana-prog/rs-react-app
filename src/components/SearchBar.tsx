@@ -28,14 +28,23 @@ class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
 
   render() {
     return (
-      <div style={{ marginBottom: '20px' }}>
+      <div
+        style={{
+          margin: '10px auto',
+          display: 'flex',
+          justifyContent: 'center',
+        }}
+      >
         <input
+          style={{ padding: '5px' }}
           type="text"
           value={this.state.input}
           onChange={this.handleChange}
           placeholder="Search..."
         />
-        <button onClick={this.handleClick}>Search</button>
+        <button onClick={this.handleClick} style={{ cursor: 'pointer' }}>
+          Search
+        </button>
       </div>
     );
   }

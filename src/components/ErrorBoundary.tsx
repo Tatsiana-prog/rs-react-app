@@ -15,7 +15,7 @@ class ErrorBoundary extends React.Component<Props, State> {
     this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(_: Error): State {
+  static getDerivedStateFromError(): State {
     return { hasError: true };
   }
 
@@ -25,7 +25,7 @@ class ErrorBoundary extends React.Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
-      return <h2>Something went wrong. Please refresh the page.</h2>;
+      return <h2>Что-то пошло не так. Пожалуйста, обновите страницу.</h2>;
     }
 
     return this.props.children;

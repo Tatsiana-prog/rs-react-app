@@ -8,8 +8,8 @@ interface AppState {
   forceError: boolean;
 }
 
-class App extends React.Component<{}, AppState> {
-  constructor(props: {}) {
+class App extends React.Component<unknown, AppState> {
+  constructor(props: unknown) {
     super(props);
     this.state = {
       searchTerm: localStorage.getItem('searchTerm') || '',
@@ -34,14 +34,48 @@ class App extends React.Component<{}, AppState> {
     return (
       <ErrorBoundary>
         <div style={{ padding: '20px', background: 'orange', height: '100%' }}>
-          <SearchBar
-            defaultTerm={this.state.searchTerm}
-            onSearch={this.handleSearch}
-          />
-          <button onClick={this.throwError} style={{ marginTop: '10px' }}>
-            Throw Error
-          </button>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <img
+              src="/img/pokimg.png"
+              alt="Pokémon"
+              style={{
+                width: '250px',
+                height: '200px',
+                objectFit: 'contain',
+              }}
+            />
+            <p
+              style={{
+                fontSize: '22px',
+                textAlign: 'center',
+                margin: '10px 0',
+              }}
+            >
+              Все данные о Pokémon в одном месте
+            </p>
+            <SearchBar
+              defaultTerm={this.state.searchTerm}
+              onSearch={this.handleSearch}
+            />
+          </div>
           <Results searchTerm={this.state.searchTerm} onComplete={() => {}} />
+          <button
+            onClick={this.throwError}
+            style={{
+              marginTop: '10px',
+              cursor: 'pointer',
+              alignSelf: 'flex-end',
+            }}
+          >
+            Error Button
+          </button>
         </div>
       </ErrorBoundary>
     );

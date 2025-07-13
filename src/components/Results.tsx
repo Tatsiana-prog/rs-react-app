@@ -5,6 +5,28 @@ interface ResultsProps {
   onComplete: () => void;
 }
 
+interface PokemonListEntry {
+  name: string;
+  url: string;
+}
+
+interface PokemonListResponse {
+  results: PokemonListEntry[];
+  next: string | null;
+  previous: string | null;
+}
+
+interface PokemonType {
+  type: {
+    name: string;
+  };
+}
+
+interface PokemonDetails {
+  name: string;
+  types: PokemonType[];
+}
+
 interface ResultsState {
   loading: boolean;
   error: string | null;
@@ -40,7 +62,9 @@ class Results extends React.Component<ResultsProps, ResultsState> {
   buildUrl(url?: string) {
     if (url) return url;
     return this.props.searchTerm
-      ? `https://pokeapi.co/api/v2/pokemon/${encodeURIComponent(this.props.searchTerm.toLowerCase())}`
+      ? `https://pokeapi.co/api/v2/pokemon/${encodeURIComponent(
+          this.props.searchTerm.toLowerCase()
+        )}`
       : `https://pokeapi.co/api/v2/pokemon?limit=${this.pageSize}&offset=0`;
   }
 
@@ -51,16 +75,18 @@ class Results extends React.Component<ResultsProps, ResultsState> {
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
       const data = await res.json();
 
-      // Если это список
-      if (Array.isArray(data.results)) {
+      if ('results' in data) {
+        const typedData = data as PokemonListResponse;
         const items = await Promise.all(
-          data.results.map(async (entry: any) => {
+          typedData.results.map(async (entry: PokemonListEntry) => {
             const pokemonRes = await fetch(entry.url);
-            const pokemonData = await pokemonRes.json();
+            if (!pokemonRes.ok)
+              throw new Error(`Failed to fetch ${entry.name}`);
+            const pokemonData: PokemonDetails = await pokemonRes.json();
             return {
               name: pokemonData.name,
               description:
-                pokemonData.types.map((t: any) => t.type.name).join(', ') ||
+                pokemonData.types.map((t) => t.type.name).join(', ') ||
                 'No types',
             };
           })
@@ -68,20 +94,21 @@ class Results extends React.Component<ResultsProps, ResultsState> {
         this.setState(
           {
             items,
-            nextUrl: data.next,
-            prevUrl: data.previous,
+            nextUrl: typedData.next,
+            prevUrl: typedData.previous,
             loading: false,
           },
           this.props.onComplete
         );
       } else {
+        const pokemonData: PokemonDetails = data;
         this.setState(
           {
             items: [
               {
-                name: data.name,
+                name: pokemonData.name,
                 description:
-                  data.types.map((t: any) => t.type.name).join(', ') ||
+                  pokemonData.types.map((t) => t.type.name).join(', ') ||
                   'No types',
               },
             ],
@@ -92,12 +119,10 @@ class Results extends React.Component<ResultsProps, ResultsState> {
           this.props.onComplete
         );
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      this.setState(
-        { error: err.message, loading: false },
-        this.props.onComplete
-      );
+      const message = err instanceof Error ? err.message : String(err);
+      this.setState({ error: message, loading: false }, this.props.onComplete);
     }
   }
 
