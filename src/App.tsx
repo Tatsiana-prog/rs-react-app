@@ -43,7 +43,7 @@ class App extends React.Component<unknown, AppState> {
             }}
           >
             <img
-              src="/img/pokimg.png"
+              src="img/pokimg.png"
               alt="Pokémon"
               style={{
                 width: '250px',
