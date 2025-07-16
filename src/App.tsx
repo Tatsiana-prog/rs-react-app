@@ -1,7 +1,7 @@
 import React from 'react';
+import ErrorBoundary from './components/ErrorBoundary';
 import SearchBar from './components/SearchBar';
 import Results from './components/Results';
-import ErrorBoundary from './components/ErrorBoundary';
 
 interface AppState {
   searchTerm: string;
@@ -23,13 +23,12 @@ class App extends React.Component<unknown, AppState> {
   };
 
   throwError = () => {
+    console.log('Generating an error...');
     this.setState({ forceError: true });
   };
 
   render() {
-    if (this.state.forceError) {
-      throw new Error('Test error thrown!');
-    }
+    const { forceError, searchTerm } = this.state;
 
     return (
       <ErrorBoundary>
@@ -61,11 +60,15 @@ class App extends React.Component<unknown, AppState> {
               Все данные о Pokémon в одном месте
             </p>
             <SearchBar
-              defaultTerm={this.state.searchTerm}
+              defaultTerm={searchTerm}
               onSearch={this.handleSearch}
             />
           </div>
-          <Results searchTerm={this.state.searchTerm} onComplete={() => {}} />
+          <Results
+            searchTerm={searchTerm}
+            onComplete={() => {}}
+            showError={forceError}
+          />
           <button
             onClick={this.throwError}
             style={{

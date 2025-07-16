@@ -3,6 +3,7 @@ import React from 'react';
 interface ResultsProps {
   searchTerm: string;
   onComplete: () => void;
+  showError: boolean;
 }
 
 interface PokemonListEntry {
@@ -128,7 +129,10 @@ class Results extends React.Component<ResultsProps, ResultsState> {
 
   render() {
     const { loading, error, items, nextUrl, prevUrl } = this.state;
+    const { showError } = this.props;
+
     if (loading) return <div>Loading...</div>;
+    if (showError) return <h1 style={{ color: 'red', textAlign: 'center' }}>Something went wrong.</h1>; // Показываем ошибку, если требуется
     if (error) return <div style={{ color: 'red' }}>Error: {error}</div>;
 
     return (
