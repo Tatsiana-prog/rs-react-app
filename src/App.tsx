@@ -59,10 +59,7 @@ class App extends React.Component<unknown, AppState> {
             >
               Все данные о Pokémon в одном месте
             </p>
-            <SearchBar
-              defaultTerm={searchTerm}
-              onSearch={this.handleSearch}
-            />
+            <SearchBar defaultTerm={searchTerm} onSearch={this.handleSearch} />
           </div>
           <Results
             searchTerm={searchTerm}
