@@ -3,5 +3,5 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  base: "rs-react-app",
-}); 
+  base: 'rs-react-app',
+});
