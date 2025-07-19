@@ -1,7 +1,7 @@
 import React from 'react';
 import ErrorBoundary from './components/ErrorBoundary';
-import SearchBar from './components/SearchBar';
-import Results from './components/Results';
+import SearchBar from './components/SearchBar/SearchBar';
+import Results from './components/Results/Results';
 
 interface AppState {
   searchTerm: string;
