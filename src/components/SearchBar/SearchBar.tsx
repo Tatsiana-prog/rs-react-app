@@ -1,5 +1,5 @@
 import React from 'react';
-import ButtonSearch from '../ButtonSearch/ButtonSearch';
+import Button from '../Button/Button';
 import Search from '../Search/Search';
 
 interface SearchBarProps {
@@ -37,7 +37,7 @@ class SearchBar extends React.Component<SearchBarProps, SearchBarState> {
           value={this.state.input} // Передаем текущее значение input
           onChange={this.handleInputChange}
         />
-        <ButtonSearch btnName="Search" onClick={this.handleSearchClick} />
+        <Button btnName="Search" onClick={this.handleSearchClick} />
       </div>
     );
   }
