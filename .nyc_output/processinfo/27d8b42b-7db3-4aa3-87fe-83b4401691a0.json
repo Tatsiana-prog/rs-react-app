@@ -1,0 +1,16 @@
+{
+  "parent": "d020aa3c-7679-413c-b8ab-5626ae3313ef",
+  "pid": 6536,
+  "argv": [
+    "C:\\nvm4w\\nodejs\\node.exe",
+    "D:\\учеба\\rs-react-app\\node_modules\\jest-worker\\build\\processChild.js"
+  ],
+  "execArgv": [],
+  "cwd": "D:\\учеба\\rs-react-app",
+  "time": 1753016075970,
+  "ppid": 4300,
+  "coverageFilename": "D:\\учеба\\rs-react-app\\.nyc_output\\27d8b42b-7db3-4aa3-87fe-83b4401691a0.json",
+  "externalId": "",
+  "uuid": "27d8b42b-7db3-4aa3-87fe-83b4401691a0",
+  "files": []
+}

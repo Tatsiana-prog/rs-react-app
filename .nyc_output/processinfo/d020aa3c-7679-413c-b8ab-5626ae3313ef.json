@@ -1,0 +1,16 @@
+{
+  "parent": null,
+  "pid": 4300,
+  "argv": [
+    "C:\\nvm4w\\nodejs\\node.exe",
+    "D:\\учеба\\rs-react-app\\node_modules\\jest\\bin\\jest.js"
+  ],
+  "execArgv": [],
+  "cwd": "D:\\учеба\\rs-react-app",
+  "time": 1753016067937,
+  "ppid": 12648,
+  "coverageFilename": "D:\\учеба\\rs-react-app\\.nyc_output\\d020aa3c-7679-413c-b8ab-5626ae3313ef.json",
+  "externalId": "",
+  "uuid": "d020aa3c-7679-413c-b8ab-5626ae3313ef",
+  "files": []
+}
