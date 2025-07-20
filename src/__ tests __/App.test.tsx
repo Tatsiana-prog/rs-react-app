@@ -26,7 +26,7 @@ describe('App component', () => {
     const errorButton = getByText('Error Button');
     fireEvent.click(errorButton);
 
-    const errorText = getByText('Ошибка внутри setState!');
+    const errorText = getByText('Something went wrong.');
     expect(errorText).toBeInTheDocument();
   });
 });

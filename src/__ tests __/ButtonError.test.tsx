@@ -17,6 +17,6 @@ describe('ButtonError component', () => {
 
     fireEvent.click(button);
 
-    expect(getByText('Ошибка внутри setState!')).toBeInTheDocument();
+    expect(getByText('Something went wrong.')).toBeInTheDocument();
   });
 });

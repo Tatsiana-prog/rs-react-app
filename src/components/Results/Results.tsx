@@ -1,4 +1,5 @@
 import React from 'react';
+import Card from '../Card/Card';
 
 interface ResultsProps {
   searchTerm: string;
@@ -51,65 +52,59 @@ class Results extends React.Component<ResultsProps, ResultsState> {
   }
 
   componentDidMount() {
-    this.fetchPage(this.buildUrl());
+    this.fetchPage(this.getUrl());
   }
 
   componentDidUpdate(prevProps: ResultsProps) {
     if (this.props.searchTerm !== prevProps.searchTerm) {
-      this.fetchPage(this.buildUrl());
+      this.fetchPage(this.getUrl());
     }
   }
 
-  buildUrl(url?: string) {
+  getUrl(url?: string): string {
     if (url) return url;
     return this.props.searchTerm
-      ? `https://pokeapi.co/api/v2/pokemon/${encodeURIComponent(
-          this.props.searchTerm.toLowerCase()
-        )}`
+      ? `https://pokeapi.co/api/v2/pokemon/${encodeURIComponent(this.props.searchTerm.toLowerCase())}`
       : `https://pokeapi.co/api/v2/pokemon?limit=${this.pageSize}&offset=0`;
   }
 
   async fetchPage(url: string) {
     this.setState({ loading: true, error: null });
     try {
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-      const data = await res.json();
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+      const data = await response.json();
 
       if ('results' in data) {
-        const typedData = data as PokemonListResponse;
+        const list = data as PokemonListResponse;
         const items = await Promise.all(
-          typedData.results.map(async (entry: PokemonListEntry) => {
-            const pokemonRes = await fetch(entry.url);
-            if (!pokemonRes.ok)
-              throw new Error(`Failed to fetch ${entry.name}`);
-            const pokemonData: PokemonDetails = await pokemonRes.json();
+          list.results.map(async (entry: PokemonListEntry) => {
+            const res = await fetch(entry.url);
+            if (!res.ok) throw new Error(`Failed to fetch ${entry.name}`);
+            const details: PokemonDetails = await res.json();
             return {
-              name: pokemonData.name,
+              name: details.name,
               description:
-                pokemonData.types.map((t) => t.type.name).join(', ') ||
-                'No types',
+                details.types.map((t) => t.type.name).join(', ') || 'No types',
             };
           })
         );
         this.setState(
-          {
-            items,
-            nextUrl: typedData.next,
-            prevUrl: typedData.previous,
-            loading: false,
-          },
-          this.props.onComplete
+          { items, nextUrl: list.next, prevUrl: list.previous, loading: false },
+          () => {
+            if (typeof this.props.onComplete === 'function')
+              this.props.onComplete();
+          }
         );
       } else {
-        const pokemonData: PokemonDetails = data;
+        const details: PokemonDetails = data;
         this.setState(
           {
             items: [
               {
-                name: pokemonData.name,
+                name: details.name,
                 description:
-                  pokemonData.types.map((t) => t.type.name).join(', ') ||
+                  details.types.map((t) => t.type.name).join(', ') ||
                   'No types',
               },
             ],
@@ -117,13 +112,24 @@ class Results extends React.Component<ResultsProps, ResultsState> {
             prevUrl: null,
             loading: false,
           },
-          this.props.onComplete
+          () => {
+            if (typeof this.props.onComplete === 'function')
+              this.props.onComplete();
+          }
         );
       }
-    } catch (err) {
-      console.error(err);
-      const message = err instanceof Error ? err.message : String(err);
-      this.setState({ error: message, loading: false }, this.props.onComplete);
+    } catch (error) {
+      console.error(error);
+      this.setState(
+        {
+          error: error instanceof Error ? error.message : String(error),
+          loading: false,
+        },
+        () => {
+          if (typeof this.props.onComplete === 'function')
+            this.props.onComplete();
+        }
+      );
     }
   }
 
@@ -154,32 +160,21 @@ class Results extends React.Component<ResultsProps, ResultsState> {
               flexWrap: 'wrap',
             }}
           >
-            {items.map((item, idx) => (
-              <div
-                key={idx}
-                style={{
-                  width: '180px',
-                  height: '180px',
-                  background: 'black',
-                  borderRadius: '20px',
-                }}
-              >
-                <h2 style={{ textAlign: 'center', color: 'white' }}>
-                  {item.name}
-                </h2>
-                <p style={{ textAlign: 'center', color: 'white' }}>
-                  {item.description}
-                </p>
-              </div>
+            {items.map((item) => (
+              <Card
+                key={item.name}
+                name={item.name}
+                description={item.description}
+              />
             ))}
           </div>
         )}
-
         <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
           <button
             style={{ cursor: 'pointer' }}
             onClick={() => prevUrl && this.fetchPage(prevUrl)}
             disabled={!prevUrl}
+            aria-label="Previous page"
           >
             « Prev
           </button>
@@ -187,6 +182,7 @@ class Results extends React.Component<ResultsProps, ResultsState> {
             style={{ cursor: 'pointer' }}
             onClick={() => nextUrl && this.fetchPage(nextUrl)}
             disabled={!nextUrl}
+            aria-label="Next page"
           >
             Next »
           </button>
@@ -195,5 +191,4 @@ class Results extends React.Component<ResultsProps, ResultsState> {
     );
   }
 }
-
 export default Results;

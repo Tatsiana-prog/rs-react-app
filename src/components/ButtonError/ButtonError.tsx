@@ -14,7 +14,7 @@ class ButtonError extends Component<ButtonErrorProps, ButtonErrorState> {
   };
 
   throwError = () => {
-    this.setState({ error: 'Ошибка внутри setState!' });
+    this.setState({ error: 'Something went wrong.' });
   };
 
   render() {

@@ -1,57 +1,140 @@
 import React from 'react';
 import '@testing-library/jest-dom';
-import { render, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import Results from '../components/Results/Results';
 
-test('fetches and displays Pokemon data correctly', async () => {
-  global.fetch = jest.fn().mockResolvedValue({
-    ok: true,
-    json: () =>
-      Promise.resolve({
-        name: 'pikachu',
-        types: [{ type: { name: 'electric' } }],
-      }),
+describe('Results component', () => {
+  const mockOnComplete = jest.fn();
+
+  beforeEach(() => {
+    jest.resetAllMocks();
   });
 
-  const onCompleteMock = jest.fn();
-  const { getByText } = render(
-    <Results
-      searchTerm="pikachu"
-      onComplete={onCompleteMock}
-      showError={false}
-    />
-  );
+  const mockListResponse = {
+    results: [
+      { name: 'bulbasaur', url: 'https://pokeapi.co/api/v2/pokemon/1/' },
+      { name: 'ivysaur', url: 'https://pokeapi.co/api/v2/pokemon/2/' },
+    ],
+    next: 'https://pokeapi.co/api/v2/pokemon?offset=2&limit=18',
+    previous: null,
+  };
 
-  expect(getByText('Loading...')).toBeInTheDocument();
-
-  await waitFor(() => {
-    expect(getByText('pikachu')).toBeInTheDocument();
-    expect(getByText('electric')).toBeInTheDocument();
+  const mockPokemonDetails = (name: string, types: string[]) => ({
+    name,
+    types: types.map((typeName) => ({ type: { name: typeName } })),
   });
 
-  expect(onCompleteMock).toHaveBeenCalled();
-});
+  test('fetches and displays a list of pokemons with pagination', async () => {
+    global.fetch = jest
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockListResponse,
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockPokemonDetails('bulbasaur', ['grass', 'poison']),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockPokemonDetails('ivysaur', ['grass', 'poison']),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          results: [],
+          next: null,
+          previous: 'https://pokeapi.co/api/v2/pokemon?offset=0&limit=18',
+        }),
+      });
 
-test('displays error message when fetch fails', async () => {
-  global.fetch = jest.fn().mockResolvedValue({
-    ok: false,
-    status: 404,
+    render(
+      <Results searchTerm="" onComplete={mockOnComplete} showError={false} />
+    );
+
+    expect(screen.getByText(/Loading.../i)).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByText('bulbasaur')).toBeInTheDocument();
+      expect(screen.getByText('ivysaur')).toBeInTheDocument();
+    });
+
+    const descriptions = screen.getAllByText('grass, poison');
+    expect(descriptions.length).toBeGreaterThanOrEqual(2);
+
+    expect(screen.getByText('« Prev')).toBeDisabled();
+    expect(screen.getByText('Next »')).toBeEnabled();
+
+    fireEvent.click(screen.getByText('Next »'));
+
+    await waitFor(() => {
+      expect(screen.getByText('No results found.')).toBeInTheDocument();
+    });
+
+    expect(screen.getByText('« Prev')).toBeEnabled();
+    expect(mockOnComplete).toHaveBeenCalledTimes(2);
   });
 
-  const onCompleteMock = jest.fn();
-  const { getByText } = render(
-    <Results
-      searchTerm="invalidpokemon"
-      onComplete={onCompleteMock}
-      showError={false}
-    />
-  );
+  test('fetches and displays a single pokemon by searchTerm', async () => {
+    global.fetch = jest.fn().mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockPokemonDetails('pikachu', ['electric']),
+    });
 
-  expect(getByText('Loading...')).toBeInTheDocument();
+    render(
+      <Results
+        searchTerm="pikachu"
+        onComplete={mockOnComplete}
+        showError={false}
+      />
+    );
 
-  await waitFor(() => {
-    expect(getByText('Error: HTTP error! Status: 404')).toBeInTheDocument();
+    expect(screen.getByText(/Loading.../i)).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByText('pikachu')).toBeInTheDocument();
+      expect(screen.getByText('electric')).toBeInTheDocument();
+    });
+
+    expect(mockOnComplete).toHaveBeenCalled();
   });
 
-  expect(onCompleteMock).toHaveBeenCalled();
+  test('shows error message and calls onComplete on fetch failure', async () => {
+    global.fetch = jest.fn().mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+      json: async () => ({}),
+    });
+
+    render(
+      <Results
+        searchTerm="unknown"
+        onComplete={mockOnComplete}
+        showError={false}
+      />
+    );
+
+    expect(screen.getByText(/Loading.../i)).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByText(/Error: HTTP error: 500/i)).toBeInTheDocument();
+    });
+
+    expect(mockOnComplete).toHaveBeenCalled();
+  });
+
+  test('shows generic error message when showError is true', async () => {
+    global.fetch = jest.fn().mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ results: [] }),
+    });
+
+    render(
+      <Results searchTerm="" onComplete={mockOnComplete} showError={true} />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/Something went wrong./i)).toBeInTheDocument();
+    });
+  });
 });

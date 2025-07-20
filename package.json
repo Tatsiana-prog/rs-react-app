@@ -15,7 +15,6 @@
     "deploy": "gh-pages -d dist",
     "test": "jest",
     "coverage": "jest --coverage"
-    
   },
   "dependencies": {
     "jest-environment-jsdom": "^30.0.4",
