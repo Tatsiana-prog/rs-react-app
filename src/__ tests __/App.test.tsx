@@ -1,14 +1,32 @@
-// src/__ tests __/App.test.tsx
 import React from 'react';
 import '@testing-library/jest-dom';
-import { render } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 import App from '../App';
 
-test('demo', () => {
-  expect(true).toBe(true);
-});
+describe('App component', () => {
+  it('renders App component without errors', () => {
+    render(<App />);
+  });
 
-test('Renders the main page', () => {
-  render(<App />);
-  expect(true).toBeTruthy();
+  it('handles search term input and search functionality', () => {
+    const { getByPlaceholderText, getByText } = render(<App />);
+
+    const searchInput = getByPlaceholderText('Search by name');
+    fireEvent.change(searchInput, { target: { value: 'Pikachu' } });
+
+    const searchButton = getByText('Search');
+    fireEvent.click(searchButton);
+
+    expect(searchInput).toHaveValue('Pikachu');
+  });
+
+  it('triggers error in Results component when ButtonError is clicked', () => {
+    const { getByText } = render(<App />);
+
+    const errorButton = getByText('Error Button');
+    fireEvent.click(errorButton);
+
+    const errorText = getByText('Ошибка внутри setState!');
+    expect(errorText).toBeInTheDocument();
+  });
 });
