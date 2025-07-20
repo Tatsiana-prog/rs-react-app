@@ -73,7 +73,7 @@ class App extends React.Component<unknown, AppState> {
               onComplete={() => {}}
               showError={forceError}
             />
-            <ButtonError buttonText="Error Button"/>
+            <ButtonError buttonText="Error Button" />
           </div>
         </ErrorBoundary>
       </div>
