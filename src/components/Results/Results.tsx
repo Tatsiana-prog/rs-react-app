@@ -137,7 +137,7 @@ class Results extends React.Component<ResultsProps, ResultsState> {
         <h1 style={{ color: 'red', textAlign: 'center' }}>
           Something went wrong.
         </h1>
-      ); // Показываем ошибку, если требуется
+      );
     if (error) return <div style={{ color: 'red' }}>Error: {error}</div>;
 
     return (
