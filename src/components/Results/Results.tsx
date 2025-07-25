@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Card from '../Card/Card';
 
 interface ResultsProps {
@@ -29,47 +29,35 @@ interface PokemonDetails {
   types: PokemonType[];
 }
 
-interface ResultsState {
-  loading: boolean;
-  error: string | null;
-  items: { name: string; description: string }[];
-  nextUrl: string | null;
-  prevUrl: string | null;
-}
+const Results: React.FC<ResultsProps> = ({
+  searchTerm,
+  onComplete,
+  showError,
+}) => {
+  const pageSize = 18;
 
-class Results extends React.Component<ResultsProps, ResultsState> {
-  pageSize = 18;
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [items, setItems] = useState<{ name: string; description: string }[]>(
+    []
+  );
+  const [nextUrl, setNextUrl] = useState<string | null>(null);
+  const [prevUrl, setPrevUrl] = useState<string | null>(null);
 
-  constructor(props: ResultsProps) {
-    super(props);
-    this.state = {
-      loading: false,
-      error: null,
-      items: [],
-      nextUrl: null,
-      prevUrl: null,
-    };
-  }
+  useEffect(() => {
+    fetchPage(getUrl());
+  }, [searchTerm]);
 
-  componentDidMount() {
-    this.fetchPage(this.getUrl());
-  }
-
-  componentDidUpdate(prevProps: ResultsProps) {
-    if (this.props.searchTerm !== prevProps.searchTerm) {
-      this.fetchPage(this.getUrl());
-    }
-  }
-
-  getUrl(url?: string): string {
+  const getUrl = (url?: string): string => {
     if (url) return url;
-    return this.props.searchTerm
-      ? `https://pokeapi.co/api/v2/pokemon/${encodeURIComponent(this.props.searchTerm.toLowerCase())}`
-      : `https://pokeapi.co/api/v2/pokemon?limit=${this.pageSize}&offset=0`;
-  }
+    return searchTerm
+      ? `https://pokeapi.co/api/v2/pokemon/${encodeURIComponent(searchTerm.toLowerCase())}`
+      : `https://pokeapi.co/api/v2/pokemon?limit=${pageSize}&offset=0`;
+  };
 
-  async fetchPage(url: string) {
-    this.setState({ loading: true, error: null });
+  const fetchPage = async (url: string) => {
+    setLoading(true);
+    setError(null);
     try {
       const response = await fetch(url);
       if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
@@ -77,7 +65,7 @@ class Results extends React.Component<ResultsProps, ResultsState> {
 
       if ('results' in data) {
         const list = data as PokemonListResponse;
-        const items = await Promise.all(
+        const fetchedItems = await Promise.all(
           list.results.map(async (entry: PokemonListEntry) => {
             const res = await fetch(entry.url);
             if (!res.ok) throw new Error(`Failed to fetch ${entry.name}`);
@@ -89,106 +77,82 @@ class Results extends React.Component<ResultsProps, ResultsState> {
             };
           })
         );
-        this.setState(
-          { items, nextUrl: list.next, prevUrl: list.previous, loading: false },
-          () => {
-            if (typeof this.props.onComplete === 'function')
-              this.props.onComplete();
-          }
-        );
+        setItems(fetchedItems);
+        setNextUrl(list.next);
+        setPrevUrl(list.previous);
       } else {
         const details: PokemonDetails = data;
-        this.setState(
+        setItems([
           {
-            items: [
-              {
-                name: details.name,
-                description:
-                  details.types.map((t) => t.type.name).join(', ') ||
-                  'No types',
-              },
-            ],
-            nextUrl: null,
-            prevUrl: null,
-            loading: false,
+            name: details.name,
+            description:
+              details.types.map((t) => t.type.name).join(', ') || 'No types',
           },
-          () => {
-            if (typeof this.props.onComplete === 'function')
-              this.props.onComplete();
-          }
-        );
+        ]);
+        setNextUrl(null);
+        setPrevUrl(null);
       }
     } catch (error) {
       console.error(error);
-      this.setState(
-        {
-          error: error instanceof Error ? error.message : String(error),
-          loading: false,
-        },
-        () => {
-          if (typeof this.props.onComplete === 'function')
-            this.props.onComplete();
-        }
-      );
+      setError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setLoading(false);
+      if (typeof onComplete === 'function') onComplete();
     }
-  }
+  };
 
-  render() {
-    const { loading, error, items, nextUrl, prevUrl } = this.state;
-    const { showError } = this.props;
-
-    if (loading) return <div>Loading...</div>;
-    if (showError)
-      return (
-        <h1 style={{ color: 'red', textAlign: 'center' }}>
-          Something went wrong.
-        </h1>
-      );
-    if (error) return <div style={{ color: 'red' }}>Error: {error}</div>;
-
+  if (loading) return <div>Loading...</div>;
+  if (showError)
     return (
-      <div style={{ marginTop: '20px' }}>
-        {items.length === 0 ? (
-          <div>No results found.</div>
-        ) : (
-          <div
-            style={{
-              marginTop: '100px',
-              display: 'flex',
-              gap: '30px',
-              justifyContent: 'center',
-              flexWrap: 'wrap',
-            }}
-          >
-            {items.map((item) => (
-              <Card
-                key={item.name}
-                name={item.name}
-                description={item.description}
-              />
-            ))}
-          </div>
-        )}
-        <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
-          <button
-            style={{ cursor: 'pointer' }}
-            onClick={() => prevUrl && this.fetchPage(prevUrl)}
-            disabled={!prevUrl}
-            aria-label="Previous page"
-          >
-            « Prev
-          </button>
-          <button
-            style={{ cursor: 'pointer' }}
-            onClick={() => nextUrl && this.fetchPage(nextUrl)}
-            disabled={!nextUrl}
-            aria-label="Next page"
-          >
-            Next »
-          </button>
-        </div>
-      </div>
+      <h1 style={{ color: 'red', textAlign: 'center' }}>
+        Something went wrong.
+      </h1>
     );
-  }
-}
- export default Results;
+  if (error) return <div style={{ color: 'red' }}>Error: {error}</div>;
+
+  return (
+    <div style={{ marginTop: '20px' }}>
+      {items.length === 0 ? (
+        <div>No results found.</div>
+      ) : (
+        <div
+          style={{
+            marginTop: '100px',
+            display: 'flex',
+            gap: '30px',
+            justifyContent: 'center',
+            flexWrap: 'wrap',
+          }}
+        >
+          {items.map((item) => (
+            <Card
+              key={item.name}
+              name={item.name}
+              description={item.description}
+            />
+          ))}
+        </div>
+      )}
+      <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
+        <button
+          style={{ cursor: 'pointer' }}
+          onClick={() => prevUrl && fetchPage(prevUrl)}
+          disabled={!prevUrl}
+          aria-label="Previous page"
+        >
+          « Prev
+        </button>
+        <button
+          style={{ cursor: 'pointer' }}
+          onClick={() => nextUrl && fetchPage(nextUrl)}
+          disabled={!nextUrl}
+          aria-label="Next page"
+        >
+          Next »
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default Results;

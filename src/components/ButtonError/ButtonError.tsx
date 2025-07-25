@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 interface ButtonErrorProps {
   buttonText: string;
+  onClick?: () => void;
 }
 
 interface ButtonErrorState {
@@ -15,6 +16,9 @@ class ButtonError extends Component<ButtonErrorProps, ButtonErrorState> {
 
   throwError = () => {
     this.setState({ error: 'Something went wrong.' });
+    if (this.props.onClick) {
+      this.props.onClick();
+    }
   };
 
   render() {

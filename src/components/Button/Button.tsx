@@ -5,10 +5,8 @@ interface ButtonProps {
   onClick?: () => void;
 }
 
-class Button extends React.Component<ButtonProps> {
-  render() {
-    return <button onClick={this.props.onClick}>{this.props.btnName}</button>;
-  }
-}
+const Button: React.FC<ButtonProps> = ({ btnName, onClick }) => {
+  return <button onClick={onClick}>{btnName}</button>;
+};
 
 export default Button;
