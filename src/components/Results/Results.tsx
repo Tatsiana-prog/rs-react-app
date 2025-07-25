@@ -191,4 +191,4 @@ class Results extends React.Component<ResultsProps, ResultsState> {
     );
   }
 }
-export default Results;
+ export default Results;
