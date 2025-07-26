@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import ErrorBoundary from './components/ErrorBoundary';
 import SearchBar from './components/SearchBar/SearchBar';
 import Results from './components/Results/Results';

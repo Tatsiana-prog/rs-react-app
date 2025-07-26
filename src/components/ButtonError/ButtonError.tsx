@@ -5,32 +5,22 @@ interface ButtonErrorProps {
   onClick?: () => void;
 }
 
-interface ButtonErrorState {
-  error: string | null;
-}
-
-class ButtonError extends Component<ButtonErrorProps, ButtonErrorState> {
-  state: ButtonErrorState = {
-    error: null,
-  };
-
+class ButtonError extends Component<ButtonErrorProps> {
   throwError = () => {
-    this.setState({ error: 'Something went wrong.' });
     if (this.props.onClick) {
       this.props.onClick();
     }
+    throw new Error('Something went wrong.');
   };
 
   render() {
     const { buttonText } = this.props;
-    const { error } = this.state;
 
     return (
       <div>
         <button onClick={this.throwError} style={{ marginTop: '20px' }}>
           {buttonText}
         </button>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
       </div>
     );
   }
