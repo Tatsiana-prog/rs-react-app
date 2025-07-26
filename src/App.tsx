@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import ErrorBoundary from './components/ErrorBoundary';
+import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import SearchBar from './components/SearchBar/SearchBar';
 import Results from './components/Results/Results';
 import ButtonError from './components/ButtonError/ButtonError';
@@ -8,16 +8,10 @@ const App: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>(
     localStorage.getItem('searchTerm') || ''
   );
-  const [forceError, setForceError] = useState<boolean>(false);
 
   const handleSearch = (term: string) => {
     localStorage.setItem('searchTerm', term);
     setSearchTerm(term);
-  };
-
-  const throwError = () => {
-    console.log('Generating an error...');
-    setForceError(true);
   };
 
   return (
@@ -55,9 +49,9 @@ const App: React.FC = () => {
           <Results
             searchTerm={searchTerm}
             onComplete={() => {}}
-            showError={forceError}
+            showError={false} // Update this if you're not using forceError
           />
-          <ButtonError buttonText="Error Button" onClick={throwError} />
+          <ButtonError />
         </div>
       </ErrorBoundary>
     </div>

@@ -1,30 +1,34 @@
 import React from 'react';
 import '@testing-library/jest-dom';
-import { render } from '@testing-library/react';
-import ErrorBoundary from '../components/ErrorBoundary';
+import { render, screen } from '@testing-library/react';
+import ErrorBoundary from '../components/ErrorBoundary/ErrorBoundary';
 
-describe('ErrorBoundary component', () => {
-  it('should render children when there is no error', () => {
-    const { getByText } = render(
+const ProblemChild = () => {
+  throw new Error('Ошибка в дочернем компоненте');
+};
+
+describe('ErrorBoundary', () => {
+  it('рендерит дочерние элементы без ошибок', () => {
+    render(
       <ErrorBoundary>
-        <div>Test Child Component</div>
+        <div>Всё хорошо</div>
       </ErrorBoundary>
     );
 
-    expect(getByText('Test Child Component')).toBeInTheDocument();
+    expect(screen.getByText('Всё хорошо')).toBeInTheDocument();
   });
 
-  it('should render error message when there is an error', () => {
-    const ErrorComponent = () => {
-      throw new Error('Test error');
-    };
+  it('отображает fallback при ошибке в дочернем компоненте', () => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
 
-    const { getByText } = render(
+    render(
       <ErrorBoundary>
-        <ErrorComponent />
+        <ProblemChild />
       </ErrorBoundary>
     );
 
-    expect(getByText('Something went wrong.')).toBeInTheDocument();
+    expect(screen.getByText(/something went wrong/i)).toBeInTheDocument();
+
+    (console.error as jest.Mock).mockRestore();
   });
 });

@@ -1,27 +1,35 @@
-import React, { Component } from 'react';
+import React from 'react';
 
-interface ButtonErrorProps {
-  buttonText: string;
-  onClick?: () => void;
+interface ButtonErrorState {
+  throwError: boolean;
 }
 
-class ButtonError extends Component<ButtonErrorProps> {
-  throwError = () => {
-    if (this.props.onClick) {
-      this.props.onClick();
-    }
-    throw new Error('Something went wrong.');
-  };
+export class ButtonError extends React.Component<unknown, ButtonErrorState> {
+  constructor(props: unknown) {
+    super(props);
+    this.state = { throwError: false };
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick() {
+    this.setState({ throwError: true });
+  }
 
   render() {
-    const { buttonText } = this.props;
+    if (this.state.throwError) {
+      throw new Error('Искусственная ошибка при клике на кнопку');
+    }
 
     return (
-      <div>
-        <button onClick={this.throwError} style={{ marginTop: '20px' }}>
-          {buttonText}
-        </button>
-      </div>
+      <button
+        onClick={this.handleClick}
+        style={{
+          textAlign: 'center',
+          margin: '25px auto',
+        }}
+      >
+        Button Error
+      </button>
     );
   }
 }
