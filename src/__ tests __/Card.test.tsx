@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import Card from '../components/Card/Card'; // Убедитесь, что путь к файлу верный
+import Card from '../components/Card/Card';
 
 describe('Card component', () => {
   test('renders name and description correctly', () => {
@@ -10,11 +10,9 @@ describe('Card component', () => {
 
     render(<Card name={testName} description={testDescription} />);
 
-    // Проверяем, что заголовок и описание отображаются
     expect(screen.getByText(testName)).toBeInTheDocument();
     expect(screen.getByText(testDescription)).toBeInTheDocument();
 
-    // Дополнительно можно проверить, что они находятся в правильных тегах
     expect(screen.getByText(testName).tagName).toBe('H2');
     expect(screen.getByText(testDescription).tagName).toBe('P');
   });

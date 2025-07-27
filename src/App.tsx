@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
-import SearchBar from './components/SearchBar/SearchBar';
+import About from './components/Pages/About/About';
+import Home from './components/Pages/Home/Home';
+import NotFound from './components/Pages/404/404';
 import Results from './components/Results/Results';
-import ButtonError from './components/ButtonError/ButtonError';
 
 const App: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>(
@@ -15,46 +17,29 @@ const App: React.FC = () => {
   };
 
   return (
-    <div>
+    <Router basename="/rs-react-app">
       <ErrorBoundary>
-        <div style={{ padding: '20px', background: 'orange', height: '100%' }}>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}
-          >
-            <img
-              src="img/pokimg.png"
-              alt="Pokémon"
-              style={{
-                width: '250px',
-                height: '200px',
-                objectFit: 'contain',
-              }}
-            />
-            <p
-              style={{
-                fontSize: '22px',
-                textAlign: 'center',
-                margin: '10px 0',
-              }}
-            >
-              Все данные о Pokémon в одном месте
-            </p>
-            <SearchBar defaultTerm={searchTerm} onSearch={handleSearch} />
-          </div>
-          <Results
-            searchTerm={searchTerm}
-            onComplete={() => {}}
-            showError={false} // Update this if you're not using forceError
+        <Routes>
+          <Route
+            path="/"
+            element={<Home searchTerm={searchTerm} onSearch={handleSearch} />}
           />
-          <ButtonError />
-        </div>
+          <Route
+            path="/results"
+            element={
+              <Results
+                searchTerm={searchTerm}
+                onComplete={() => console.log('Search complete')}
+                showError={true}
+              />
+            }
+          />
+          <Route path="/about" element={<About />} />
+          <Route path="/404" element={<NotFound />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </ErrorBoundary>
-    </div>
+    </Router>
   );
 };
 

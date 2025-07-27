@@ -1,12 +1,14 @@
-// jest.config.ts
 export default {
   preset: 'ts-jest',
   testEnvironment: 'jest-environment-jsdom',
+  setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'], // Здесь подключаем jest-fetch-mock
+  setupFiles: [], // Можно оставить пустым или удалить, если не используется
   transform: {
-    '^.+\\.tsx?$': 'ts-jest', // process `*.tsx` files with `ts-jest`
+    '^.+\\.tsx?$': 'ts-jest',
   },
   moduleNameMapper: {
-    '\\.(gif|ttf|eot|svg|png)$': '<rootDir>/test/__mocks__/fileMock.js',
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+    '^.+\\.(jpg|jpeg|png|gif|svg)$': '<rootDir>/src/__mocks__/fileMock.js',
   },
   coverageThreshold: {
     global: {

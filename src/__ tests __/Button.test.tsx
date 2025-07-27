@@ -1,7 +1,7 @@
 import React from 'react';
 import '@testing-library/jest-dom';
 import { render } from '@testing-library/react';
-import Button from '../components/Button/Button'; // Update the path to your Button component
+import Button from '../components/Button/Button';
 
 describe('Button component', () => {
   it('renders button with correct text', () => {

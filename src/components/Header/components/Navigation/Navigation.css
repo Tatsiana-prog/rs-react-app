@@ -1,0 +1,21 @@
+.navigation {
+}
+
+.navigation ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  gap: 15px;
+}
+
+.navigation a {
+  color: white;
+  text-decoration: none;
+  padding: 10px 15px;
+  display: block;
+}
+
+.navigation a:hover {
+  background-color: #444;
+  color: orange;
+}
