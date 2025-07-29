@@ -1,0 +1,17 @@
+.about {
+  padding: 0;
+  background-color: #f9f9f9;
+  color: #333;
+}
+.SectionAbout {
+  padding: 30px 20px;
+}
+.SectionAbout h1 {
+  font-size: 2em;
+  margin-bottom: 10px;
+}
+
+.SectionAbout p {
+  margin: 10px 0;
+  line-height: 1.5;
+}
