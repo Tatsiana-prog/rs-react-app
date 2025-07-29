@@ -1,18 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import About from './components/Pages/About/About';
 import Home from './components/Pages/Home/Home';
 import NotFound from './components/Pages/404/404';
 import Results from './components/Results/Results';
+import PokemonDetails from './components/PokemonDetails/PokemonDetails';
+import UseLocalStorage from './hooks/UseLocalStorage';
 
 const App: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState<string>(
-    localStorage.getItem('searchTerm') || ''
-  );
+  const [searchTerm, setSearchTerm] = UseLocalStorage('searchTerm', '');
 
   const handleSearch = (term: string) => {
-    localStorage.setItem('searchTerm', term);
     setSearchTerm(term);
   };
 
@@ -23,17 +22,31 @@ const App: React.FC = () => {
           <Route
             path="/"
             element={<Home searchTerm={searchTerm} onSearch={handleSearch} />}
-          />
-          <Route
-            path="/results"
-            element={
-              <Results
-                searchTerm={searchTerm}
-                onComplete={() => console.log('Search complete')}
-                showError={true}
-              />
-            }
-          />
+          >
+            <Route
+              index
+              element={
+                <Results
+                  searchTerm={searchTerm}
+                  onComplete={() => {}}
+                  showError={true}
+                />
+              }
+            />
+            <Route
+              path="results"
+              element={
+                <Results
+                  searchTerm={searchTerm}
+                  onComplete={() => {}}
+                  showError={true}
+                />
+              }
+            >
+              <Route path="details/:name" element={<PokemonDetails />} />
+            </Route>
+          </Route>
+
           <Route path="/about" element={<About />} />
           <Route path="/404" element={<NotFound />} />
           <Route path="*" element={<NotFound />} />

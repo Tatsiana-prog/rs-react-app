@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import '@testing-library/jest-dom';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import Card from '../Card/Card';
 
 interface ResultsProps {
@@ -23,11 +22,6 @@ interface PokemonType {
   type: { name: string };
 }
 
-interface PokemonDetails {
-  name: string;
-  types: PokemonType[];
-}
-
 const pageSize = 18;
 
 const Results: React.FC<ResultsProps> = ({
@@ -40,16 +34,12 @@ const Results: React.FC<ResultsProps> = ({
 
   const params = new URLSearchParams(location.search);
   const pageParam = params.get('page') || '1';
-  const detailsParam = params.get('details');
-
   const currentPage = parseInt(pageParam, 10);
 
   const [items, setItems] = useState<{ name: string; description: string }[]>(
     []
   );
   const [loadingList, setLoadingList] = useState(true);
-  const [loadingDetails, setLoadingDetails] = useState(false);
-  const [details, setDetails] = useState<PokemonDetails | null>(null);
   const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
@@ -65,10 +55,12 @@ const Results: React.FC<ResultsProps> = ({
         const res = await fetch(
           `https://pokeapi.co/api/v2/pokemon?limit=${pageSize}&offset=${offset}`
         );
-        if (!res.ok) throw new Error();
-        const data: PokemonListResponse = await res.json();
 
+        if (!res.ok) throw new Error('Failed to fetch Pokémon list');
+
+        const data: PokemonListResponse = await res.json();
         const total = Math.ceil(data.count / pageSize);
+
         if (currentPage > total) {
           navigate('/404');
           return;
@@ -103,34 +95,6 @@ const Results: React.FC<ResultsProps> = ({
     fetchList();
   }, [currentPage, navigate, onComplete, showError]);
 
-  useEffect(() => {
-    if (!detailsParam) {
-      setDetails(null);
-      return;
-    }
-
-    const fetchDetails = async () => {
-      setLoadingDetails(true);
-      try {
-        const res = await fetch(
-          `https://pokeapi.co/api/v2/pokemon/${detailsParam}`
-        );
-        if (!res.ok) {
-          navigate('/404');
-          return;
-        }
-        const data: PokemonDetails = await res.json();
-        setDetails(data);
-      } catch {
-        navigate('/404');
-      } finally {
-        setLoadingDetails(false);
-      }
-    };
-
-    fetchDetails();
-  }, [detailsParam, navigate]);
-
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || (totalPages && newPage > totalPages)) {
       navigate('/404');
@@ -142,15 +106,7 @@ const Results: React.FC<ResultsProps> = ({
   };
 
   const handleCardClick = (name: string) => {
-    const newParams = new URLSearchParams(location.search);
-    newParams.set('details', name);
-    navigate({ pathname: location.pathname, search: newParams.toString() });
-  };
-
-  const handleCloseDetails = () => {
-    const newParams = new URLSearchParams(location.search);
-    newParams.delete('details');
-    navigate({ pathname: location.pathname, search: newParams.toString() });
+    navigate(`/results/details/${name}${location.search}`);
   };
 
   if (loadingList) return <div>Loading...</div>;
@@ -160,17 +116,13 @@ const Results: React.FC<ResultsProps> = ({
   );
 
   return (
-    <div style={{ display: 'flex', marginTop: '20px', padding: '0 20px' }}>
+    <div style={{ display: 'flex', marginTop: 20, padding: '0 20px' }}>
       <div style={{ flex: 1 }}>
-        <div style={{ display: 'flex', gap: '30px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 30, flexWrap: 'wrap' }}>
           {filteredItems.map((item) => (
             <div
               key={item.name}
-              style={{
-                cursor: 'pointer',
-                border:
-                  detailsParam === item.name ? '2px solid orange' : 'none',
-              }}
+              style={{ cursor: 'pointer' }}
               onClick={() => handleCardClick(item.name)}
             >
               <Card name={item.name} description={item.description} />
@@ -179,11 +131,7 @@ const Results: React.FC<ResultsProps> = ({
         </div>
 
         <div
-          style={{
-            marginTop: '20px',
-            display: 'flex',
-            justifyContent: 'center',
-          }}
+          style={{ marginTop: 20, display: 'flex', justifyContent: 'center' }}
         >
           <button
             onClick={() => handlePageChange(currentPage - 1)}
@@ -203,34 +151,15 @@ const Results: React.FC<ResultsProps> = ({
         </div>
       </div>
 
-      {detailsParam && (
-        <div
-          style={{
-            width: '300px',
-            height: '200px',
-            marginLeft: '20px',
-            border: '3px solid black',
-            padding: '10px',
-            background: 'white',
-            borderRadius: '20px',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.7)',
-            textAlign: 'center',
-          }}
-        >
-          {loadingDetails ? (
-            <div>Loading details...</div>
-          ) : details ? (
-            <>
-              <h2 style={{ color: 'orange' }}>Details</h2>
-              <h3>{details.name}</h3>
-              <p>{details.types.map((t) => t.type.name).join(', ')}</p>
-              <button onClick={handleCloseDetails}>Close</button>
-            </>
-          ) : (
-            <div>Details not found.</div>
-          )}
-        </div>
-      )}
+      <div
+        style={{
+          marginLeft: 20,
+          minWidth: 320,
+          display: location.pathname.includes('/details/') ? 'block' : 'none',
+        }}
+      >
+        <Outlet />
+      </div>
     </div>
   );
 };

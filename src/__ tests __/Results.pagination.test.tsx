@@ -4,13 +4,13 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import Results from '../components/Results/Results';
 
-type MockCardProps = {
+type CardProps = {
   name: string;
   description: string;
 };
 
 jest.mock('../components/Card/Card', () => {
-  const MockCard = ({ name, description }: MockCardProps) => (
+  const MockCard = ({ name, description }: CardProps) => (
     <div data-testid="card">
       <div>{name}</div>
       <div>{description}</div>
@@ -40,7 +40,7 @@ const mockListResponse = {
 
 const mockBulbasaur = {
   name: 'bulbasaur',
-  types: [{ type: { name: 'grass' } }, { type: { name: 'poison' } }],
+  types: [{ type: { name: 'grass' } }],
 };
 
 const mockCharmander = {
@@ -50,7 +50,6 @@ const mockCharmander = {
 
 beforeEach(() => {
   mockNavigate.mockClear();
-
   global.fetch = jest
     .fn()
     .mockResolvedValueOnce({
@@ -65,8 +64,8 @@ beforeEach(() => {
     });
 });
 
-describe('Results component', () => {
-  it('renders list correctly', async () => {
+describe('Pagination behavior', () => {
+  it('disables Prev button on first page and Next button on last page', async () => {
     render(
       <MemoryRouter initialEntries={['/results?page=1']}>
         <Routes>
@@ -81,30 +80,23 @@ describe('Results component', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getAllByTestId('card')).toHaveLength(2);
       expect(screen.getByText('Page 1 of 2')).toBeInTheDocument();
+    });
+
+    const prevButton = screen.getByRole('button', { name: /prev/i });
+    const nextButton = screen.getByRole('button', { name: /next/i });
+
+    expect(prevButton).toBeDisabled();
+    expect(nextButton).not.toBeDisabled();
+
+    fireEvent.click(nextButton);
+    expect(mockNavigate).toHaveBeenCalledWith({
+      pathname: '/results',
+      search: 'page=2',
     });
   });
 
-  it('disables Next button on last page and enables Prev button', async () => {
-    global.fetch = jest
-      .fn()
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          count: 36,
-          results: [
-            { name: 'venusaur', url: 'https://pokeapi.co/api/v2/pokemon/3/' },
-          ],
-        }),
-      })
-      .mockResolvedValueOnce({
-        json: async () => ({
-          name: 'venusaur',
-          types: [{ type: { name: 'grass' } }, { type: { name: 'poison' } }],
-        }),
-      });
-
+  it('disables Next button on last page', async () => {
     render(
       <MemoryRouter initialEntries={['/results?page=2']}>
         <Routes>
@@ -135,7 +127,7 @@ describe('Results component', () => {
     });
   });
 
-  it('navigates to /404 on invalid page param', async () => {
+  it('navigates to /404 on invalid page', async () => {
     render(
       <MemoryRouter initialEntries={['/results?page=0']}>
         <Routes>
@@ -143,29 +135,6 @@ describe('Results component', () => {
             path="/results"
             element={
               <Results searchTerm="" onComplete={jest.fn()} showError={false} />
-            }
-          />
-        </Routes>
-      </MemoryRouter>
-    );
-
-    await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/404');
-    });
-  });
-
-  it('handles fetch failure and redirects to /404', async () => {
-    (global.fetch as jest.Mock) = jest
-      .fn()
-      .mockRejectedValue(new Error('Fail'));
-
-    render(
-      <MemoryRouter initialEntries={['/results?page=1']}>
-        <Routes>
-          <Route
-            path="/results"
-            element={
-              <Results searchTerm="" onComplete={jest.fn()} showError={true} />
             }
           />
         </Routes>

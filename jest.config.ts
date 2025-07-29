@@ -1,8 +1,8 @@
 export default {
   preset: 'ts-jest',
   testEnvironment: 'jest-environment-jsdom',
-  setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'], // Здесь подключаем jest-fetch-mock
-  setupFiles: [], // Можно оставить пустым или удалить, если не используется
+  setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
+  setupFiles: [],
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
   },
