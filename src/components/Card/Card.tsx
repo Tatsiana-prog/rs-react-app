@@ -1,4 +1,5 @@
 import React from 'react';
+import ButtonSave from "../ButtonSave/ButtonSave"
 
 interface CardProps {
   name: string;
@@ -20,6 +21,7 @@ const Card: React.FC<CardProps> = ({ name, description }) => (
       padding: '10px',
     }}
   >
+    <ButtonSave/>
     <h2 style={{ textAlign: 'center' }}>{name}</h2>
     <p style={{ textAlign: 'center' }}>{description}</p>
   </div>
