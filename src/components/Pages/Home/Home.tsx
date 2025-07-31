@@ -25,7 +25,7 @@ const Home: React.FC<{
         }}
       >
         <img
-          src="img/pokimg.png"
+          src="rs-react-app/img/pokimg.png"
           alt="Pokémon"
           style={{ width: '250px', height: '200px', objectFit: 'contain' }}
         />
