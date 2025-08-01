@@ -14,8 +14,8 @@ const ThemeToggleButton: React.FC = () => {
       <img
         src={
           theme === 'light'
-            ? 'rs-react-app/img/sun.png'
-            : 'rs-react-app/img/moon.png'
+            ? './img/sun.png'
+            : './img/moon.png'
         }
         alt={theme === 'light' ? 'Светлая тема' : 'Тёмная тема'}
         className="theme-icon"
