@@ -138,9 +138,15 @@ const Results: React.FC<ResultsProps> = ({
         {showSelectedItems && <SelectedItems />}
 
         <div
-          style={{ marginTop: 20, display: 'flex', justifyContent: 'center' }}
+          style={{
+            marginTop: 20,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
         >
           <button
+            className="btn-arrow"
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
           >
@@ -150,6 +156,7 @@ const Results: React.FC<ResultsProps> = ({
             Page {currentPage} of {totalPages}
           </span>
           <button
+            className="btn-arrow"
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
           >

@@ -7,6 +7,8 @@ import NotFound from './components/Pages/404/404';
 import Results from './components/Results/Results';
 import PokemonDetails from './components/PokemonDetails/PokemonDetails';
 import UseLocalStorage from './hooks/UseLocalStorage';
+import { ThemeProvider } from './ThemeContext';
+import './App.css';
 
 const App: React.FC = () => {
   const [searchTerm, setSearchTerm] = UseLocalStorage('searchTerm', '');
@@ -16,43 +18,45 @@ const App: React.FC = () => {
   };
 
   return (
-    <Router basename="/rs-react-app">
-      <ErrorBoundary>
-        <Routes>
-          <Route
-            path="/"
-            element={<Home searchTerm={searchTerm} onSearch={handleSearch} />}
-          >
+    <ThemeProvider>
+      <Router basename="/rs-react-app">
+        <ErrorBoundary>
+          <Routes>
             <Route
-              index
-              element={
-                <Results
-                  searchTerm={searchTerm}
-                  onComplete={() => {}}
-                  showError={true}
-                />
-              }
-            />
-            <Route
-              path="results"
-              element={
-                <Results
-                  searchTerm={searchTerm}
-                  onComplete={() => {}}
-                  showError={true}
-                />
-              }
+              path="/"
+              element={<Home searchTerm={searchTerm} onSearch={handleSearch} />}
             >
-              <Route path="details/:name" element={<PokemonDetails />} />
+              <Route
+                index
+                element={
+                  <Results
+                    searchTerm={searchTerm}
+                    onComplete={() => {}}
+                    showError={true}
+                  />
+                }
+              />
+              <Route
+                path="results"
+                element={
+                  <Results
+                    searchTerm={searchTerm}
+                    onComplete={() => {}}
+                    showError={true}
+                  />
+                }
+              >
+                <Route path="details/:name" element={<PokemonDetails />} />
+              </Route>
             </Route>
-          </Route>
 
-          <Route path="/about" element={<About />} />
-          <Route path="/404" element={<NotFound />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </ErrorBoundary>
-    </Router>
+            <Route path="/about" element={<About />} />
+            <Route path="/404" element={<NotFound />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </ErrorBoundary>
+      </Router>
+    </ThemeProvider>
   );
 };
 

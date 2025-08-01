@@ -24,15 +24,7 @@ const Home: React.FC<{
           alt="Pokémon"
           style={{ width: '250px', height: '200px', objectFit: 'contain' }}
         />
-        <h1
-          style={{
-            fontSize: 22,
-            textAlign: 'center',
-            margin: '10px 0',
-          }}
-        >
-          Все данные о Pokémon в одном месте
-        </h1>
+        <h1>Все данные о Pokémon в одном месте</h1>
         <SearchBar defaultTerm={searchTerm} onSearch={onSearch} />
         <Outlet />
       </div>

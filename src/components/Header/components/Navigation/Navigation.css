@@ -6,13 +6,14 @@
 }
 
 .navigation a {
-  color: white;
+  color: orange;
   text-decoration: none;
   padding: 10px 15px;
   display: block;
+  transition: all 0.5s ease-in;
 }
 
 .navigation a:hover {
-  background-color: #444;
-  color: orange;
+  color: rgba(255, 166, 0, 0.8);
+  text-decoration: underline;
 }

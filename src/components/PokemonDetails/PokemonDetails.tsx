@@ -43,7 +43,7 @@ const PokemonDetails: React.FC = () => {
       <h2 style={{ color: 'orange' }}>Details</h2>
       <h3>{name}</h3>
       <p>{types.join(', ') || 'Loading...'}</p>
-      <button className="button-primary" onClick={() => navigate(-1)}>
+      <button className="button" onClick={() => navigate(-1)}>
         Close
       </button>
     </div>
