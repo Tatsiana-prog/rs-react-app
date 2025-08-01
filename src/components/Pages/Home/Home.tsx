@@ -1,5 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
+import './Home.css';
 import SearchBar from '../../SearchBar/SearchBar';
 import Header from '../../Header/Header';
 
@@ -8,13 +9,7 @@ const Home: React.FC<{
   onSearch: (term: string) => void;
 }> = ({ searchTerm, onSearch }) => {
   return (
-    <div
-      style={{
-        background: 'orange',
-        minHeight: '100vh',
-        paddingBottom: '50px',
-      }}
-    >
+    <div className="wrapper">
       <Header />
       <div
         style={{
@@ -29,7 +24,7 @@ const Home: React.FC<{
           alt="Pokémon"
           style={{ width: '250px', height: '200px', objectFit: 'contain' }}
         />
-        <p
+        <h1
           style={{
             fontSize: 22,
             textAlign: 'center',
@@ -37,7 +32,7 @@ const Home: React.FC<{
           }}
         >
           Все данные о Pokémon в одном месте
-        </p>
+        </h1>
         <SearchBar defaultTerm={searchTerm} onSearch={onSearch} />
         <Outlet />
       </div>

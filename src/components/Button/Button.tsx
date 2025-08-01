@@ -1,4 +1,5 @@
 import React from 'react';
+import './Button.css';
 
 interface ButtonProps {
   btnName: string;
@@ -6,7 +7,11 @@ interface ButtonProps {
 }
 
 const Button: React.FC<ButtonProps> = ({ btnName, onClick }) => {
-  return <button onClick={onClick}>{btnName}</button>;
+  return (
+    <button className="button" onClick={onClick}>
+      {btnName}
+    </button>
+  );
 };
 
 export default Button;

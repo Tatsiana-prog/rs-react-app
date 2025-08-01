@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import Card from '../Card/Card';
+import SelectedItems from '../SelectedItems/SelectedItems';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../../store';
 
 interface ResultsProps {
   searchTerm: string;
@@ -41,7 +44,10 @@ const Results: React.FC<ResultsProps> = ({
   );
   const [loadingList, setLoadingList] = useState(true);
   const [totalPages, setTotalPages] = useState(0);
-
+  const selectedItems = useSelector(
+    (state: RootState) => state.items.selectedItems
+  );
+  const showSelectedItems = selectedItems.length > 0;
   useEffect(() => {
     if (isNaN(currentPage) || currentPage < 1) {
       navigate('/404');
@@ -129,6 +135,7 @@ const Results: React.FC<ResultsProps> = ({
             </div>
           ))}
         </div>
+        {showSelectedItems && <SelectedItems />}
 
         <div
           style={{ marginTop: 20, display: 'flex', justifyContent: 'center' }}

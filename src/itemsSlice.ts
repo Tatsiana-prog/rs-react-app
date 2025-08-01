@@ -1,8 +1,13 @@
+import { createSlice } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
 
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+interface Item {
+  name: string;
+  description: string;
+}
 
 interface ItemState {
-  selectedItems: string[];
+  selectedItems: Item[];
 }
 
 const initialState: ItemState = {
@@ -13,14 +18,20 @@ const itemsSlice = createSlice({
   name: 'items',
   initialState,
   reducers: {
-    addItem(state, action: PayloadAction<string>) {
-      state.selectedItems.push(action.payload);
-    },
-    removeItem(state, action: PayloadAction<string>) {
-      state.selectedItems = state.selectedItems.filter(item => item !== action.payload);
+    toggleItem(state, action: PayloadAction<Item>) {
+      const item = action.payload;
+      const exists = state.selectedItems.find((i) => i.name === item.name);
+
+      if (exists) {
+        state.selectedItems = state.selectedItems.filter(
+          (i) => i.name !== item.name
+        );
+      } else {
+        state.selectedItems.push(item);
+      }
     },
   },
 });
 
-export const { addItem, removeItem } = itemsSlice.actions;
+export const { toggleItem } = itemsSlice.actions;
 export default itemsSlice.reducer;
