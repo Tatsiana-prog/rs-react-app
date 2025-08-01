@@ -9,6 +9,7 @@
     "jsx": "react",
     "module": "commonjs",
     "target": "es6",
-    "strict": true
+    "strict": true,
+    "typeRoots": ["./node_modules/@types", "./src/@types"]
   }
 }

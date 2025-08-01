@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleItem } from '../../itemsSlice';
-import './Card.css'; 
+import './Card.css';
 
 interface CardProps {
   name: string;

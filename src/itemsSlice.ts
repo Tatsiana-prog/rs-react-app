@@ -21,7 +21,6 @@ const itemsSlice = createSlice({
     toggleItem(state, action: PayloadAction<Item>) {
       const item = action.payload;
       const exists = state.selectedItems.find((i) => i.name === item.name);
-
       if (exists) {
         state.selectedItems = state.selectedItems.filter(
           (i) => i.name !== item.name
