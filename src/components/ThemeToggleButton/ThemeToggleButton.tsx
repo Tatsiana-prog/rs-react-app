@@ -12,11 +12,7 @@ const ThemeToggleButton: React.FC = () => {
       aria-label="Toggle theme"
     >
       <img
-        src={
-          theme === 'light'
-            ? './img/sun.png'
-            : './img/moon.png'
-        }
+        src={theme === 'light' ? './img/sun.png' : './img/moon.png'}
         alt={theme === 'light' ? 'Светлая тема' : 'Тёмная тема'}
         className="theme-icon"
       />
