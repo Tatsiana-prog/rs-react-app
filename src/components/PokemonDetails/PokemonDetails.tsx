@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import './PokemonDetails.css';
 
 type RouteParams = {
   name?: string;
@@ -38,22 +39,13 @@ const PokemonDetails: React.FC = () => {
   if (!name) return <div>No Pokémon name provided</div>;
 
   return (
-    <div
-      style={{
-        width: '300px',
-        height: '200px',
-        border: '3px solid black',
-        padding: '10px',
-        background: 'white',
-        borderRadius: '20px',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.7)',
-        textAlign: 'center',
-      }}
-    >
+    <div className="block-details">
       <h2 style={{ color: 'orange' }}>Details</h2>
       <h3>{name}</h3>
       <p>{types.join(', ') || 'Loading...'}</p>
-      <button onClick={() => navigate(-1)}>Close</button>
+      <button className="button" onClick={() => navigate(-1)}>
+        Close
+      </button>
     </div>
   );
 };

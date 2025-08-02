@@ -12,6 +12,7 @@ const Search: React.FC<SearchProps> = ({ value, onChange }) => {
 
   return (
     <input
+      style={{ borderRadius: '8px', border: 'none', padding: '15px' }}
       type="search"
       value={value}
       onChange={handleChange}

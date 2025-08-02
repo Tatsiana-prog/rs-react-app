@@ -1,17 +1,13 @@
 import React from 'react';
+import './404.css';
 
 const NotFound: React.FC = () => {
   return (
-    <div
-      style={{
-        padding: '80px 0',
-        textAlign: 'center',
-        background: 'orange',
-        height: '100vh',
-      }}
-    >
-      <h1 style={{ margin: '0' }}>404 - Page Not Found</h1>
-      <p>Sorry, the page you are looking for does not exist.</p>
+    <div className="wrapper">
+      <section className="section-notfound">
+        <h1>404 - Page Not Found</h1>
+        <p>Sorry, the page you are looking for does not exist.</p>
+      </section>
     </div>
   );
 };

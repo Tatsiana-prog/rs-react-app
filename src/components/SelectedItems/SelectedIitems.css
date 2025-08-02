@@ -1,0 +1,37 @@
+.buttons-wrapper {
+  display: flex;
+  gap: 15px;
+  margin-top: 15px;
+  justify-content: center;
+}
+
+.button {
+  background: black;
+  padding: 10px 20px;
+  border-radius: 8px;
+  color: white;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.7);
+  border: none;
+  cursor: pointer;
+}
+.button:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.selected-items {
+  margin-top: 40px;
+  background: var(--bg-add);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.7);
+}
+.selected-items li {
+  color: var(--text-color);
+  font-size: 18px;
+}
+ul {
+  list-style-type: none;
+}
+h2 {
+  margin: 0;
+}

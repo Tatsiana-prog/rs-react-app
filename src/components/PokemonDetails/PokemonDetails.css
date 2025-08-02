@@ -1,0 +1,10 @@
+.block-details {
+  width: 300p;
+  height: 200px;
+  padding: 10px;
+  background: var(--bg-add);
+  color: var(--text-color);
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+  text-align: center;
+}
