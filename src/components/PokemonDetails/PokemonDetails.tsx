@@ -1,48 +1,38 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useGetPokemonDetailsQuery } from '../../apiSlice';
 import './PokemonDetails.css';
 
 type RouteParams = {
   name?: string;
 };
 
-type PokemonType = {
-  type: {
-    name: string;
-  };
-};
-
-type PokemonAPIResponse = {
-  types: PokemonType[];
-};
-
 const PokemonDetails: React.FC = () => {
   const { name } = useParams<RouteParams>();
   const navigate = useNavigate();
-  const [types, setTypes] = useState<string[]>([]);
 
-  useEffect(() => {
-    if (!name) return;
+  const { data, error, isLoading } = useGetPokemonDetailsQuery(name ?? '');
 
-    fetch(`https://pokeapi.co/api/v2/pokemon/${name}`)
-      .then((res) => res.json())
-      .then((data: PokemonAPIResponse) => {
-        const fetchedTypes = data.types.map((t) => t.type.name);
-        setTypes(fetchedTypes);
-      })
-      .catch((error) => {
-        console.error('Failed to fetch Pokémon data:', error);
-        navigate('/404');
-      });
-  }, [name, navigate]);
+  if (!name) {
+    return <div>No Pokémon name provided</div>;
+  }
 
-  if (!name) return <div>No Pokémon name provided</div>;
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    console.error('Failed to fetch Pokémon data:', error);
+    return <div>Error fetching Pokémon data.</div>;
+  }
+
+  const types = data?.types.map((t) => t.type.name) || [];
 
   return (
     <div className="block-details">
       <h2 style={{ color: 'orange' }}>Details</h2>
       <h3>{name}</h3>
-      <p>{types.join(', ') || 'Loading...'}</p>
+      <p>{types.join(', ') || 'No types available'}</p>
       <button className="button" onClick={() => navigate(-1)}>
         Close
       </button>
