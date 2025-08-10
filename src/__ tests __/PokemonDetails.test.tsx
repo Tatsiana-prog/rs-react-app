@@ -1,96 +1,97 @@
 import React from 'react';
 import '@testing-library/jest-dom';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { render, screen, fireEvent } from '@testing-library/react';
 import PokemonDetails from '../components/PokemonDetails/PokemonDetails';
-import type { NavigateFunction } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useGetPokemonDetailsQuery } from '../apiSlice';
 
-const mockNavigate = jest.fn() as jest.MockedFunction<NavigateFunction>;
-jest.mock('react-router-dom', () => {
-  const actual = jest.requireActual('react-router-dom');
-  return {
-    ...actual,
-    useNavigate: () => mockNavigate,
-  };
-});
+jest.mock('react-router-dom', () => ({
+  useParams: jest.fn(),
+  useNavigate: jest.fn(),
+}));
+
+jest.mock('../apiSlice', () => ({
+  useGetPokemonDetailsQuery: jest.fn(),
+}));
+
+const mockUseParams = useParams as jest.Mock;
+const mockUseNavigate = useNavigate as jest.Mock;
+const mockUseGetPokemonDetailsQuery = useGetPokemonDetailsQuery as jest.Mock;
 
 describe('PokemonDetails component', () => {
   beforeEach(() => {
-    global.fetch = jest.fn();
-    mockNavigate.mockClear();
+    jest.clearAllMocks();
   });
 
-  it('отображает сообщение, если имя не указано в URL', () => {
-    render(
-      <MemoryRouter initialEntries={['/']}>
-        <Routes>
-          <Route path="/" element={<PokemonDetails />} />
-        </Routes>
-      </MemoryRouter>
-    );
+  it('renders "No Pokémon name provided" if name is missing', () => {
+    mockUseParams.mockReturnValue({ name: undefined });
+    mockUseGetPokemonDetailsQuery.mockReturnValue({
+      data: null,
+      error: null,
+      isLoading: false,
+    });
 
-    expect(screen.getByText(/no pokémon name provided/i)).toBeInTheDocument();
+    render(<PokemonDetails />);
+    expect(screen.getByText('No Pokémon name provided')).toBeInTheDocument();
   });
 
-  it('загружает и отображает типы покемона', async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
-      json: async () => ({
-        types: [{ type: { name: 'grass' } }, { type: { name: 'poison' } }],
-      }),
+  it('renders loading state when loading', () => {
+    mockUseParams.mockReturnValue({ name: 'pikachu' });
+    mockUseGetPokemonDetailsQuery.mockReturnValue({
+      data: null,
+      error: null,
+      isLoading: true,
     });
 
-    render(
-      <MemoryRouter initialEntries={['/pokemon/bulbasaur']}>
-        <Routes>
-          <Route path="/pokemon/:name" element={<PokemonDetails />} />
-        </Routes>
-      </MemoryRouter>
-    );
-
-    expect(screen.getByText(/bulbasaur/i)).toBeInTheDocument();
-
-    await waitFor(() => {
-      expect(screen.getByText(/grass, poison/i)).toBeInTheDocument();
-    });
+    render(<PokemonDetails />);
+    expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 
-  it('переходит на /404 при ошибке загрузки', async () => {
-    (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('API error'));
-
-    render(
-      <MemoryRouter initialEntries={['/pokemon/missingno']}>
-        <Routes>
-          <Route path="/pokemon/:name" element={<PokemonDetails />} />
-        </Routes>
-      </MemoryRouter>
-    );
-
-    await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/404');
+  it('renders error state when error occurs', () => {
+    mockUseParams.mockReturnValue({ name: 'pikachu' });
+    mockUseGetPokemonDetailsQuery.mockReturnValue({
+      data: null,
+      error: new Error('Fetch error'),
+      isLoading: false,
     });
+
+    render(<PokemonDetails />);
+    expect(
+      screen.getByText('Error fetching Pokémon data.')
+    ).toBeInTheDocument();
   });
 
-  it('вызывает navigate(-1) при клике на кнопку Close', async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
-      json: async () => ({
-        types: [{ type: { name: 'fire' } }],
-      }),
+  it('renders pokemon name and types', () => {
+    mockUseParams.mockReturnValue({ name: 'pikachu' });
+    mockUseGetPokemonDetailsQuery.mockReturnValue({
+      data: {
+        types: [{ type: { name: 'electric' } }, { type: { name: 'cute' } }],
+      },
+      error: null,
+      isLoading: false,
     });
 
-    render(
-      <MemoryRouter initialEntries={['/pokemon/charmander']}>
-        <Routes>
-          <Route path="/pokemon/:name" element={<PokemonDetails />} />
-        </Routes>
-      </MemoryRouter>
-    );
+    render(<PokemonDetails />);
+    expect(screen.getByText('Details')).toBeInTheDocument();
+    expect(screen.getByText('pikachu')).toBeInTheDocument();
+    expect(screen.getByText('electric, cute')).toBeInTheDocument();
+  });
 
-    await waitFor(() => {
-      expect(screen.getByText(/fire/i)).toBeInTheDocument();
+  it('calls navigate(-1) when "Close" button is clicked', () => {
+    const navigateMock = jest.fn();
+    mockUseNavigate.mockReturnValue(navigateMock);
+    mockUseParams.mockReturnValue({ name: 'bulbasaur' });
+    mockUseGetPokemonDetailsQuery.mockReturnValue({
+      data: {
+        types: [{ type: { name: 'grass' } }],
+      },
+      error: null,
+      isLoading: false,
     });
 
-    fireEvent.click(screen.getByRole('button', { name: /close/i }));
-
-    expect(mockNavigate).toHaveBeenCalledWith(-1);
+    render(<PokemonDetails />);
+    const closeButton = screen.getByRole('button', { name: /close/i });
+    fireEvent.click(closeButton);
+    expect(navigateMock).toHaveBeenCalledWith(-1);
   });
 });
