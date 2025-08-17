@@ -18,7 +18,6 @@ const PokemonDetails: React.FC<PokemonDetailsProps> = ({ name }) => {
   }
 
   if (error) {
-    console.error('Failed to fetch Pokémon data:', error);
     return <div>Error fetching Pokémon data.</div>;
   }
 
