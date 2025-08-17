@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { MemoryRouter } from 'react-router-dom';
-import About from '../components/Pages/About/About';
+import About from '../app/about/page';
 
 const MockedHeader = () => <div data-testid="header">Mocked Header</div>;
 MockedHeader.displayName = 'MockedHeader';

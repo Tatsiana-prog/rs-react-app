@@ -1,23 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useLocation, Outlet } from 'react-router-dom';
+'use client';
+
+import { useSearchParams, usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useGetPokemonListQuery } from '../../apiSlice';
 import Card from '../Card/Card';
 import SelectedItems from '../SelectedItems/SelectedItems';
-import { useSelector } from 'react-redux';
-import type { RootState } from '../../store';
-import { useGetPokemonListQuery } from '../../apiSlice';
-import type { PokemonDetails, PokemonListItem } from '../../types';
+import { notFound } from 'next/navigation';
+import type { RootState } from '../../store/store';
+import type {
+  PokemonDetails as PokemonDetailsType,
+  PokemonListItem,
+} from '../../types';
 
-interface ResultsProps {
-  searchTerm: string;
-  onComplete?: () => void;
-  showError: boolean;
-}
+export default function Results({ searchTerm }: { searchTerm: string }) {
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
 
-const Results: React.FC<ResultsProps> = ({ searchTerm, onComplete }) => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const params = new URLSearchParams(location.search);
-  const pageParam = params.get('page') || '1';
+  const pageParam = searchParams?.get('page') || '1';
   const currentPage = parseInt(pageParam, 10);
 
   const selectedItems = useSelector(
@@ -27,49 +28,43 @@ const Results: React.FC<ResultsProps> = ({ searchTerm, onComplete }) => {
 
   const { data, error, isLoading, refetch } =
     useGetPokemonListQuery(currentPage);
-
-  const [detailedItems, setDetailedItems] = useState<PokemonDetails[]>([]);
+  const [detailedItems, setDetailedItems] = useState<PokemonDetailsType[]>([]);
 
   useEffect(() => {
     if (data) {
       const fetchDetails = async () => {
-        const detailsPromises = data.results.map((item: PokemonListItem) =>
-          fetch(item.url).then((res) => res.json())
-        );
-        const details = await Promise.all(detailsPromises);
-        setDetailedItems(details as PokemonDetails[]);
-        if (onComplete) onComplete();
+        try {
+          const details = await Promise.all(
+            data.results.map((item: PokemonListItem) =>
+              fetch(item.url).then((res) => res.json())
+            )
+          );
+          setDetailedItems(details);
+        } catch (err) {
+          console.error('Ошибка при загрузке деталей:', err);
+        }
       };
-
       fetchDetails();
     }
-  }, [data, onComplete]);
+  }, [data]);
 
   if (isLoading) return <div>Loading...</div>;
   if (error) {
     console.error('Error fetching Pokémon list:', error);
-    navigate('/404');
-    return <div>Failed to load Pokémon list. Please try again later.</div>;
+    notFound();
   }
 
   const count = data?.count || 0;
-
   const filteredItems = detailedItems.filter((item) =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleCardClick = (name: string) => {
-    navigate(`/results/details/${name}${location.search}`);
-  };
-
   const handlePageChange = (newPage: number) => {
-    if (newPage < 1 || (data && newPage > Math.ceil(count / 18))) {
-      navigate('/404');
-      return;
+    if (newPage < 1 || newPage > Math.ceil(count / 18)) {
+      notFound();
+    } else {
+      router.push(`${pathname}?page=${newPage}`);
     }
-    const newParams = new URLSearchParams(location.search);
-    newParams.set('page', String(newPage));
-    navigate({ pathname: location.pathname, search: newParams.toString() });
   };
 
   const handleRefresh = async () => {
@@ -81,23 +76,33 @@ const Results: React.FC<ResultsProps> = ({ searchTerm, onComplete }) => {
     }
   };
 
+  const handleCardClick = (name: string) => {
+    router.push(`/pokemon/${name}`);
+  };
+
   return (
     <div style={{ display: 'flex', marginTop: 20, padding: '0 20px' }}>
       <div style={{ flex: 1 }}>
         <div style={{ display: 'flex', gap: 30, flexWrap: 'wrap' }}>
-          {filteredItems.map((item) => (
-            <div
-              key={item.name}
-              style={{ cursor: 'pointer' }}
-              onClick={() => handleCardClick(item.name)}
-            >
-              <Card
-                name={item.name}
-                description={item.types.map((t) => t.type.name).join(', ')}
-              />
-            </div>
-          ))}
+          {filteredItems.length === 0 ? (
+            <p>Ничего не найдено по запросу &quot;{searchTerm}&quot;</p>
+          ) : (
+            filteredItems.map((item) => (
+              <div key={item.name}>
+                <Card
+                  name={item.name}
+                  description={
+                    item.types
+                      ? item.types.map((t) => t.type.name).join(', ')
+                      : 'Нет данных о типах'
+                  }
+                  onClick={() => handleCardClick(item.name)}
+                />
+              </div>
+            ))
+          )}
         </div>
+
         {showSelectedItems && <SelectedItems />}
 
         <div
@@ -138,18 +143,7 @@ const Results: React.FC<ResultsProps> = ({ searchTerm, onComplete }) => {
           </div>
         </div>
       </div>
-
-      <div
-        style={{
-          marginLeft: 20,
-          minWidth: 320,
-          display: location.pathname.includes('/details/') ? 'block' : 'none',
-        }}
-      >
-        <Outlet />
-      </div>
+      <div style={{ marginLeft: 20, minWidth: 320 }}></div>
     </div>
   );
-};
-
-export default Results;
+}

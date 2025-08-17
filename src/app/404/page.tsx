@@ -1,7 +1,8 @@
-import React from 'react';
+'use client';
+
 import './404.css';
 
-const NotFound: React.FC = () => {
+export default function NotFoundPage() {
   return (
     <div className="wrapper">
       <section className="section-notfound">
@@ -10,6 +11,4 @@ const NotFound: React.FC = () => {
       </section>
     </div>
   );
-};
-
-export default NotFound;
+}

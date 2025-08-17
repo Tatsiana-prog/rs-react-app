@@ -1,9 +1,9 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import './About.css';
-import Header from '../../Header/Header';
+'use client';
 
-const About: React.FC = () => {
+import Link from 'next/link';
+import Header from '../../components/Header/Header';
+import './About.css';
+export default function AboutPage() {
   return (
     <div className="wrapper">
       <div className="about">
@@ -14,9 +14,9 @@ const About: React.FC = () => {
           <h2>Tatsiana Vysotskaya</h2>
           <p>Frontend Developer</p>
           <p>
-            I&apos;m studying on a course {'  '}
+            I&apos;m studying on a course{' '}
             <Link
-              to="https://rs.school/courses/reactjs"
+              href="https://rs.school/courses/reactjs"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -27,6 +27,4 @@ const About: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default About;
+}

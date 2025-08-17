@@ -1,7 +1,8 @@
+'use client';
 import React from 'react';
 import './SelectedIitems.css';
 import { useSelector, useDispatch } from 'react-redux';
-import type { RootState } from '../../store';
+import type { RootState } from '../../store/store';
 import { toggleItem } from '../../itemsSlice';
 
 const SelectedItems: React.FC = () => {

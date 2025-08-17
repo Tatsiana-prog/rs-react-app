@@ -1,17 +1,13 @@
 import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import { useGetPokemonDetailsQuery } from '../../apiSlice';
 import './PokemonDetails.css';
 
-type RouteParams = {
-  name?: string;
-};
+interface PokemonDetailsProps {
+  name: string;
+}
 
-const PokemonDetails: React.FC = () => {
-  const { name } = useParams<RouteParams>();
-  const navigate = useNavigate();
-
-  const { data, error, isLoading } = useGetPokemonDetailsQuery(name ?? '');
+const PokemonDetails: React.FC<PokemonDetailsProps> = ({ name }) => {
+  const { data, error, isLoading } = useGetPokemonDetailsQuery(name);
 
   if (!name) {
     return <div>No Pokémon name provided</div>;
@@ -33,7 +29,7 @@ const PokemonDetails: React.FC = () => {
       <h2 style={{ color: 'orange' }}>Details</h2>
       <h3>{name}</h3>
       <p>{types.join(', ') || 'No types available'}</p>
-      <button className="button" onClick={() => navigate(-1)}>
+      <button className="button" onClick={() => window.history.back()}>
         Close
       </button>
     </div>

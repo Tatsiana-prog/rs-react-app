@@ -11,6 +11,7 @@
   padding: 20px 25px;
   margin: 10px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
 }
 
 .card-description {
