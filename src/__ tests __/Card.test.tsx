@@ -5,14 +5,13 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { Store } from 'redux';
-import Card from '../components/Card/Card';
-import { toggleItem } from '../itemsSlice';
+import Card from '../app/[locale]/components/Card/Card';
+import { toggleItem } from '../store/slices/itemsSlice';
 
-jest.mock('../itemsSlice', () => ({
+jest.mock('../store/slices/itemsSlice', () => ({
   toggleItem: jest.fn(),
 }));
 
-// Типизация состояния Redux
 interface Item {
   name: string;
   description: string;

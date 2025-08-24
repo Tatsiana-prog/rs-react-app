@@ -1,7 +1,7 @@
 import React from 'react';
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
-import ErrorBoundary from '../components/ErrorBoundary/ErrorBoundary';
+import ErrorBoundary from '../app/[locale]/components/ErrorBoundary/ErrorBoundary';
 
 const ProblemChild = () => {
   throw new Error('Ошибка в дочернем компоненте');

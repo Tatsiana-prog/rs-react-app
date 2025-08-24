@@ -1,0 +1,52 @@
+.languages {
+  position: relative;
+}
+
+.selectContainer {
+  display: inline-block;
+}
+
+.language {
+  display: inline-block;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding: 8px 32px 8px 12px;
+  border-radius: 8px;
+  outline: 1px solid white;
+  background-color: orange;
+  color: white;
+  border-radius: 15px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px grey;
+  width: 120px;
+  text-align: center;
+}
+
+.language:hover {
+  background: #597699;
+}
+
+.language:focus {
+  outline: none;
+  border-color: red;
+  box-shadow: 0 0 0 2px grey;
+}
+
+.language:disabled {
+  opacity: black;
+  cursor: not-allowed;
+}
+
+.select-arrow {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: white;
+  transition: transform 0.2s ease;
+}

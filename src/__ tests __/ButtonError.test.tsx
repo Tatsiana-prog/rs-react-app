@@ -1,7 +1,7 @@
 import React from 'react';
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
-import ButtonError from '../components/ButtonError/ButtonError';
+import ButtonError from '../app/[locale]/components//ButtonError/ButtonError';
 
 class TestErrorBoundary extends React.Component<
   { children: React.ReactNode },

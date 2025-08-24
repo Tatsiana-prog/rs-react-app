@@ -20,6 +20,14 @@
       }
     ]
   },
-  "include": ["**/*.ts", "**/*.tsx", "next-env.d.ts", "./dist/types/**/*.ts"],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "./dist/types/**/*.ts",
+    ".next/types/**/*.ts",
+    "next-env.d.ts",
+    "src/i18n/next-untl.dev",
+    "./dist//types/**/*.ts"
+  ],
   "exclude": ["node_modules"]
 }

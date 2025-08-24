@@ -2,21 +2,27 @@ import React from 'react';
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import Header from '../components/Header/Header';
+import Header from '../app/[locale]/components/Header/Header';
 
-jest.mock('../components/Header/components/Navigation/Navigation.tsx', () => {
-  const MockNavigation = () => <nav data-testid="navigation">Navigation</nav>;
-  MockNavigation.displayName = 'MockNavigation';
-  return MockNavigation;
-});
+jest.mock(
+  '../app/[locale]/components/Header/components/Navigation/Navigation.tsx',
+  () => {
+    const MockNavigation = () => <nav data-testid="navigation">Navigation</nav>;
+    MockNavigation.displayName = 'MockNavigation';
+    return MockNavigation;
+  }
+);
 
-jest.mock('../components/ThemeToggleButton/ThemeToggleButton.tsx', () => {
-  const MockThemeToggleButton = () => (
-    <button data-testid="theme-toggle">Toggle Theme</button>
-  );
-  MockThemeToggleButton.displayName = 'MockThemeToggleButton';
-  return MockThemeToggleButton;
-});
+jest.mock(
+  '../app/[locale]/components/ThemeToggleButton/ThemeToggleButton.tsx',
+  () => {
+    const MockThemeToggleButton = () => (
+      <button data-testid="theme-toggle">Toggle Theme</button>
+    );
+    MockThemeToggleButton.displayName = 'MockThemeToggleButton';
+    return MockThemeToggleButton;
+  }
+);
 
 describe('Header', () => {
   it('renders logo with link to home', () => {

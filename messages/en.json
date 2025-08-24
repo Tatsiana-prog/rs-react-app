@@ -1,0 +1,29 @@
+{
+  "HomePage": {
+    "title": "All Pokemon data in one place",
+    "refresh": "Refresh Data",
+    "search-button": "Search",
+    "placeholder": "Enter the full name ...",
+    "prev": "Prev",
+    "next": "Next",
+    "page": "Page {current} of {total}"
+  },
+  "AboutPage": {
+    "title": "About me",
+    "name": "Tatiana Vysotskaya",
+    "role": "Frontend developer",
+    "courseIntro": "I am studying on the course",
+    "courseName": "RS School React Course"
+  },
+  "Navigation": {
+    "home": "Home",
+    "about": "About"
+  },
+  "SelectedItems": {
+    "title": "Selected Pokemon",
+    "noItems": "No items selected",
+    "total": "Total selected",
+    "unselect": "Unselect",
+    "download": "Download"
+  }
+}
