@@ -1,40 +1,48 @@
-import React from 'react';
-import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { MemoryRouter } from 'react-router-dom';
-import About from '../components/Pages/About/About';
+import { render, screen } from '@testing-library/react';
+import AboutPage from '../app/[locale]/about/page';
 
-const MockedHeader = () => <div data-testid="header">Mocked Header</div>;
-MockedHeader.displayName = 'MockedHeader';
-
-jest.mock('../components/Header/Header.tsx', () => ({
-  __esModule: true,
-  default: () => <MockedHeader />,
+jest.mock('next-intl', () => ({
+  useTranslations: () => (key: string) => {
+    const translations: Record<string, string> = {
+      title: 'Обо мне',
+      name: 'Татьяна Высоцкая',
+      role: 'Frontend разработчик',
+      courseIntro: 'Я обучаюсь на курсе',
+      courseName: 'RS School React Course',
+    };
+    return translations[key] || key;
+  },
 }));
 
-describe('About page', () => {
-  it('renders the about page content', () => {
-    render(
-      <MemoryRouter>
-        <About />
-      </MemoryRouter>
+jest.mock('../app/[locale]/components/Header/Header.tsx', () => {
+  const MockHeader = () => <div data-testid="header">Header</div>;
+  MockHeader.displayName = 'MockHeader';
+  return MockHeader;
+});
+
+describe('AboutPage', () => {
+  it('renders translated content correctly', () => {
+    render(<AboutPage />);
+
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'Обо мне'
     );
-
-    expect(
-      screen.getByRole('heading', { level: 1, name: /about me/i })
-    ).toBeInTheDocument();
-    expect(screen.getByText('Tatsiana Vysotskaya')).toBeInTheDocument();
-    expect(screen.getByText('Frontend Developer')).toBeInTheDocument();
-
-    const link = screen.getByText(/RS School React Course/i);
-    expect(link).toBeInTheDocument();
-    expect(link.closest('a')).toHaveAttribute(
-      'href',
-      'https://rs.school/courses/reactjs'
+    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent(
+      'Татьяна Высоцкая'
     );
-    expect(link.closest('a')).toHaveAttribute('target', '_blank');
-    expect(link.closest('a')).toHaveAttribute('rel', 'noopener noreferrer');
-
+    expect(screen.getByText('Frontend разработчик')).toBeInTheDocument();
+    expect(screen.getByText('Я обучаюсь на курсе')).toBeInTheDocument();
+    expect(screen.getByText('RS School React Course')).toBeInTheDocument();
     expect(screen.getByTestId('header')).toBeInTheDocument();
+  });
+
+  it('renders link with correct attributes', () => {
+    render(<AboutPage />);
+    const link = screen.getByRole('link', { name: 'RS School React Course' });
+
+    expect(link).toHaveAttribute('href', 'https://rs.school/courses/reactjs');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   });
 });

@@ -1,0 +1,29 @@
+{
+  "HomePage": {
+    "title": "Все данные о покемонах в одном месте",
+    "refresh": "Обновить данные",
+    "search-button": "Найти",
+    "placeholder": "Введите имя ...",
+    "prev": "Назад",
+    "next": "Вперед",
+    "page": "Страница {current} из {total}"
+  },
+  "AboutPage": {
+    "title": "Обо мне",
+    "name": "Татьяна Высоцкая",
+    "role": "Frontend разработчик",
+    "courseIntro": "Я обучаюсь на курсе",
+    "courseName": "RS School React Course"
+  },
+  "Navigation": {
+    "home": "Главная",
+    "about": "О нас"
+  },
+  "SelectedItems": {
+    "title": "Выбранные покемоны",
+    "noItems": "Нет выбранных элементов",
+    "total": "Всего выбрано",
+    "unselect": "Снять выделение",
+    "download": "Скачать"
+  }
+}

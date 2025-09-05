@@ -1,0 +1,64 @@
+.card {
+  width: 200px;
+  height: auto;
+  background: var(--bg-add);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: var(--text-color);
+  padding: 20px 25px;
+  margin: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+.card-description {
+  align-items: center;
+  font-size: 18px;
+  margin: 0;
+}
+.card-title {
+  text-align: center;
+  font-size: 25px;
+  margin: 0;
+  margin: 10px 0;
+}
+.checkbox {
+  display: none;
+}
+
+.checkbox-label {
+  align-items: center;
+  cursor: pointer;
+  margin-right: 0;
+  margin-left: auto;
+}
+
+.checkbox-custom {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--color-border-checkbox);
+  border-radius: 4px;
+  position: relative;
+  background: transparent;
+  margin: 0 auto 5px;
+  font-size: 16px;
+}
+
+.checkbox:checked + .checkbox-custom {
+  background: var(--bg-checkbox-checked);
+}
+
+.checkbox:checked + .checkbox-custom::after {
+  content: '';
+  position: absolute;
+  width: 5px;
+  height: 10px;
+  border: solid var(--bg-icon-checked);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  top: 2px;
+  left: 7px;
+}

@@ -1,116 +1,98 @@
-import React from 'react';
+'use client';
 import '@testing-library/jest-dom';
+import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import Card from '../components/Card/Card';
-import { useDispatch, useSelector } from 'react-redux';
-import { useGetPokemonDetailsQuery } from '../apiSlice';
-import { toggleItem } from '../itemsSlice';
+import { Provider } from 'react-redux';
+import configureStore from 'redux-mock-store';
+import { Store } from 'redux';
+import Card from '../app/[locale]/components/Card/Card';
+import { toggleItem } from '../store/slices/itemsSlice';
 
-jest.mock('react-redux', () => ({
-  useDispatch: jest.fn(),
-  useSelector: jest.fn(),
-}));
-
-jest.mock('../apiSlice', () => ({
-  useGetPokemonDetailsQuery: jest.fn(),
-}));
-
-jest.mock('../itemsSlice', () => ({
+jest.mock('../store/slices/itemsSlice', () => ({
   toggleItem: jest.fn(),
 }));
 
-describe('Card component', () => {
-  const mockDispatch = jest.fn();
+interface Item {
+  name: string;
+  description: string;
+}
 
-  const mockedUseDispatch = useDispatch as unknown as jest.Mock;
-  const mockedUseSelector = useSelector as unknown as jest.Mock;
-  const mockedUseGetPokemonDetailsQuery =
-    useGetPokemonDetailsQuery as jest.Mock;
-  const mockedToggleItem = toggleItem as unknown as jest.Mock;
+interface RootState {
+  items: {
+    selectedItems: Item[];
+  };
+}
+
+const mockStore = configureStore<RootState>();
+const item: Item = { name: 'Test Item', description: 'Test Description' };
+
+describe('Card component', () => {
+  let store: Store<RootState>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    mockedUseDispatch.mockReturnValue(mockDispatch);
-    mockedUseSelector.mockReturnValue([]);
-  });
-
-  it('renders name and description when data is loaded', () => {
-    mockedUseGetPokemonDetailsQuery.mockReturnValue({
-      data: {
-        types: [{ type: { name: 'fire' } }, { type: { name: 'flying' } }],
+    store = mockStore({
+      items: {
+        selectedItems: [],
       },
-      isLoading: false,
-      isError: false,
-    });
-
-    render(<Card name="charizard" description="" />);
-
-    expect(screen.getByText('charizard')).toBeInTheDocument();
-    expect(screen.getByText('fire, flying')).toBeInTheDocument();
-    expect(screen.getByRole('checkbox')).not.toBeChecked();
+    }) as unknown as Store<RootState>;
+    store.dispatch = jest.fn();
   });
 
-  it('shows loading state', () => {
-    mockedUseGetPokemonDetailsQuery.mockReturnValue({
-      data: null,
-      isLoading: true,
-      isError: false,
-    });
+  it('renders with name and description', () => {
+    render(
+      <Provider store={store}>
+        <Card name={item.name} description={item.description} />
+      </Provider>
+    );
 
-    render(<Card name="pikachu" description="" />);
-
-    expect(screen.getByText('Загрузка...')).toBeInTheDocument();
-    expect(screen.getByRole('checkbox')).toBeDisabled();
+    expect(screen.getByText(item.name)).toBeInTheDocument();
+    expect(screen.getByText(item.description)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Select/i)).toBeInTheDocument();
   });
 
-  it('shows error state', () => {
-    mockedUseGetPokemonDetailsQuery.mockReturnValue({
-      data: null,
-      isLoading: false,
-      isError: true,
-    });
+  it('calls onClick when card is clicked', () => {
+    const handleClick = jest.fn();
 
-    render(<Card name="bulbasaur" description="" />);
+    render(
+      <Provider store={store}>
+        <Card
+          name={item.name}
+          description={item.description}
+          onClick={handleClick}
+        />
+      </Provider>
+    );
 
-    expect(screen.getByText('Ошибка загрузки данных')).toBeInTheDocument();
-    expect(screen.getByRole('checkbox')).toBeDisabled();
-  });
-
-  it('checkbox is checked if item is selected', () => {
-    mockedUseSelector.mockReturnValue([
-      { name: 'pikachu', description: 'electric' },
-    ]);
-
-    mockedUseGetPokemonDetailsQuery.mockReturnValue({
-      data: {
-        types: [{ type: { name: 'electric' } }],
-      },
-      isLoading: false,
-      isError: false,
-    });
-
-    render(<Card name="pikachu" description="" />);
-    expect(screen.getByRole('checkbox')).toBeChecked();
+    fireEvent.click(screen.getByText(item.name));
+    expect(handleClick).toHaveBeenCalled();
   });
 
   it('dispatches toggleItem when checkbox is clicked', () => {
-    mockedUseGetPokemonDetailsQuery.mockReturnValue({
-      data: {
-        types: [{ type: { name: 'water' } }],
+    render(
+      <Provider store={store}>
+        <Card name={item.name} description={item.description} />
+      </Provider>
+    );
+
+    fireEvent.click(screen.getByRole('checkbox'));
+    expect(toggleItem).toHaveBeenCalledWith(item);
+    expect(store.dispatch).toHaveBeenCalled();
+  });
+
+  it('checkbox is checked if item is selected', () => {
+    store = mockStore({
+      items: {
+        selectedItems: [item],
       },
-      isLoading: false,
-      isError: false,
-    });
+    }) as unknown as Store<RootState>;
+    store.dispatch = jest.fn();
 
-    render(<Card name="squirtle" description="" />);
-    const checkbox = screen.getByRole('checkbox');
-    fireEvent.click(checkbox);
+    render(
+      <Provider store={store}>
+        <Card name={item.name} description={item.description} />
+      </Provider>
+    );
 
-    expect(mockedToggleItem).toHaveBeenCalledWith({
-      name: 'squirtle',
-      description: 'water',
-    });
-
-    expect(mockDispatch).toHaveBeenCalled();
+    expect(screen.getByRole('checkbox')).toBeChecked();
   });
 });

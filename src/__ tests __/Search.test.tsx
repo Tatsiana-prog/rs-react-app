@@ -1,26 +1,32 @@
-import React from 'react';
 import '@testing-library/jest-dom';
-import { render, fireEvent } from '@testing-library/react';
-import Search from '../components/Search/Search';
+import { render, screen, fireEvent } from '@testing-library/react';
+import Search from '../app/[locale]/components/Search/Search';
 
-test('renders Search component with correct placeholder', () => {
-  const mockOnChange = jest.fn();
-  const { getByPlaceholderText } = render(
-    <Search value="" onChange={mockOnChange} />
-  );
+jest.mock('next-intl', () => ({
+  useTranslations: () => (key: string) => {
+    const translations: Record<string, string> = {
+      placeholder: 'Поиск...',
+    };
+    return translations[key] || key;
+  },
+}));
 
-  const inputElement = getByPlaceholderText('Search by name');
-  expect(inputElement).toBeInTheDocument();
-});
+describe('Search component', () => {
+  it('renders input with correct placeholder and value', () => {
+    render(<Search value="React" onChange={() => {}} />);
+    const input = screen.getByRole('searchbox');
 
-test('calls onChange handler with input value when input changes', () => {
-  const mockOnChange = jest.fn();
-  const { getByPlaceholderText } = render(
-    <Search value="" onChange={mockOnChange} />
-  );
+    expect(input).toBeInTheDocument();
+    expect(input).toHaveAttribute('placeholder', 'Поиск...');
+    expect(input).toHaveValue('React');
+  });
 
-  const inputElement = getByPlaceholderText('Search by name');
-  fireEvent.change(inputElement, { target: { value: 'Test' } });
+  it('calls onChange when input value changes', () => {
+    const handleChange = jest.fn();
+    render(<Search value="" onChange={handleChange} />);
+    const input = screen.getByRole('searchbox');
 
-  expect(mockOnChange).toHaveBeenCalledWith('Test');
+    fireEvent.change(input, { target: { value: 'Next.js' } });
+    expect(handleChange).toHaveBeenCalledWith('Next.js');
+  });
 });

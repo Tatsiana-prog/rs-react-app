@@ -1,11 +1,12 @@
-export default {
-  preset: 'ts-jest',
+import nextJest from 'next/jest';
+
+const createJestConfig = nextJest({
+  dir: './',
+});
+
+const customJestConfig = {
   testEnvironment: 'jest-environment-jsdom',
   setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
-  setupFiles: [],
-  transform: {
-    '^.+\\.tsx?$': 'ts-jest',
-  },
   moduleNameMapper: {
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     '^.+\\.(jpg|jpeg|png|gif|svg)$': '<rootDir>/src/__mocks__/fileMock.js',
@@ -19,3 +20,5 @@ export default {
     },
   },
 };
+
+export default createJestConfig(customJestConfig);
